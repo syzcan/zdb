@@ -1,4 +1,4 @@
-package com.zong.web.dbclient.bean;
+package com.zong.zdb.bean;
 
 /**
  * @desc 实体属性和数据表字段映射
@@ -25,7 +25,7 @@ public class ColumnField {
 	/**
 	 * 数据最多长度
 	 */
-	private Integer dataLength;
+	private Long dataLength;
 	/**
 	 * 数据精确度
 	 */
@@ -104,7 +104,7 @@ public class ColumnField {
 	 */
 	public void setType(String type) {
 		type = type.toLowerCase();
-		if (type.matches(".*((char)|(varchar)|(text)).*")) {
+		if (type.matches(".*((char)|(varchar)|(text)|(mediumtext)|(longtext)).*")) {
 			type = "String";
 			jdbcType = "VARCHAR";
 		} else if (type.matches(".*((int)|(bigint)|(integer)).*")) {
@@ -208,11 +208,11 @@ public class ColumnField {
 		this.dataScale = dataScale;
 	}
 
-	public Integer getDataLength() {
+	public Long getDataLength() {
 		return dataLength;
 	}
 
-	public void setDataLength(Integer dataLength) {
+	public void setDataLength(Long dataLength) {
 		this.dataLength = dataLength;
 	}
 

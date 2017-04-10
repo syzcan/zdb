@@ -1,4 +1,4 @@
-package com.zong.util;
+package com.zong.zdb.util;
 
 import java.util.HashMap;
 import java.util.List;
@@ -22,11 +22,10 @@ public class Properties {
 				data.put(Config.PACKAGE_SERVICE, Config.configData.get(Config.PACKAGE_SERVICE));
 				data.put(Config.PACKAGE_CONTROLLER, Config.configData.get(Config.PACKAGE_CONTROLLER));
 				data.put(Config.PACKAGE_JSP, Config.configData.get(Config.PACKAGE_JSP));
-				data.put("jdbc.url", map.get("jdbc.url"));
-				data.put("jdbc.username", map.get("jdbc.username"));
-				data.put("jdbc.password", map.get("jdbc.password"));
-				data.put("jdbc.database", map.get("jdbc.database"));
-				data.put("jdbc.driverClassName", map.get("jdbc.driverClassName"));
+				data.put("jdbc.driverClassName", map.get(Config.JDBC_DRIVER));
+				data.put("jdbc.url", map.get(Config.JDBC_URL));
+				data.put("jdbc.username", map.get(Config.JDBC_USERNAME));
+				data.put("jdbc.password", map.get(Config.JDBC_PASSWORD));
 			}
 		}
 	}

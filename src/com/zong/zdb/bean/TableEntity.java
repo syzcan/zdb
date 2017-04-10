@@ -1,4 +1,4 @@
-package com.zong.web.dbclient.bean;
+package com.zong.zdb.bean;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -81,65 +81,16 @@ public class TableEntity {
 	}
 
 	/**
-	 * 返回所有列【不包含主键】拼接字符 username,password
-	 */
-	public String getColumNames() {
-		StringBuffer columNames = new StringBuffer();
-		for (int i = 0; i < columnFields.size(); i++) {
-			ColumnField columnField = columnFields.get(i);
-			columNames.append(columnField.getColumn());
-			if (i != columnFields.size() - 1) {
-				columNames.append(",");
-			}
-			columNames.append("\r\n");
-		}
-		return columNames.toString();
-	}
-
-	/**
-	 * 返回所有列【不包含主键】赋值拼接字符 #{username,jdbcType=VARCHAR},#{password,jdbcType=VARCHAR}
-	 */
-	public String getColumValues() {
-		StringBuffer columNames = new StringBuffer();
-		for (int i = 0; i < columnFields.size(); i++) {
-			ColumnField columnField = columnFields.get(i);
-			columNames.append("#{" + columnField.getField() + ",jdbcType=" + columnField.getJdbcType() + "}");
-			if (i != columnFields.size() - 1) {
-				columNames.append(",");
-			}
-			columNames.append("\r\n");
-		}
-		return columNames.toString();
-	}
-
-	/**
-	 * 返回所有列sql拼接字符 name "name",password "password"
-	 */
-	public String getSqlColumNamesValues() {
-		StringBuffer sb = new StringBuffer();
-		int count = 1;
-		for (int i = 0; i < columnFields.size(); i++) {
-			if (count++ % 6 == 0) {
-				sb.append("\r    ");
-			}
-			sb.append(columnFields.get(i).getColumn() + " \"" + columnFields.get(i).getField() + "\",");
-		}
-		String result = sb.toString();
-		result = result.substring(0, result.length() - 1);
-		return result;
-	}
-
-	/**
 	 * 将表名转为java格式的类名
 	 */
 	public String getClassName() {
-		if(className==null||className.equals("")){
+		if (className == null || className.equals("")) {
 			return createClassName();
 		}
 		return className;
 	}
-	
-	public String createClassName(){
+
+	private String createClassName() {
 		String tbName = tableName;
 		if (tablePrefix && tableName.indexOf("_") > -1) {
 			tbName = tableName.substring(tableName.indexOf("_") + 1);
@@ -159,13 +110,13 @@ public class TableEntity {
 	 * 将表名转为java格式的实体名，首字母小写
 	 */
 	public String getObjectName() {
-		if(objectName==null||objectName.equals("")){
+		if (objectName == null || objectName.equals("")) {
 			return createObjectName();
 		}
 		return objectName;
 	}
-	
-	public String createObjectName(){
+
+	private String createObjectName() {
 		String tbName = tableName;
 		if (tablePrefix && tableName.indexOf("_") > -1) {
 			tbName = tableName.substring(tableName.indexOf("_") + 1);
@@ -204,11 +155,6 @@ public class TableEntity {
 		StringBuffer importPackage = new StringBuffer();
 		for (int i = 0; i < columnFields.size(); i++) {
 			ColumnField columnField = columnFields.get(i);
-			/*
-			 * if (columnField.getType().equals("Date") && importPackage.indexOf("import java.util.*;") < 0) {
-			 * importPackage.append("import java.util.*;\r\n"); } if (columnField.getType().equals("BigDecimal") &&
-			 * importPackage.indexOf("import java.math.*;") < 0) { importPackage.append("import java.math.*;\r\n"); }
-			 */
 			if (columnField.getType().equals("Date") && importPackage.indexOf("import java.util.Date;") < 0) {
 				importPackage.append("import java.util.Date;\r\n");
 			}
@@ -255,7 +201,7 @@ public class TableEntity {
 		}
 		if (primaries.isEmpty()) {
 			System.err.println(tableName + "表没有主键");
-		}else{
+		} else {
 			primary = primaries.get(0);
 		}
 		columnFields.removeAll(primaries);

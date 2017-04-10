@@ -1,9 +1,9 @@
-package com.zong.web.dbclient.dao;
+package com.zong.zdb.dao;
 
 import java.util.List;
 
-import com.zong.web.dbclient.bean.ColumnField;
-import com.zong.web.dbclient.bean.TableEntity;
+import com.zong.zdb.bean.ColumnField;
+import com.zong.zdb.bean.TableEntity;
 
 public interface IJdbcDao {
 	/**

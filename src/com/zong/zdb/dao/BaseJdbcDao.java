@@ -1,4 +1,4 @@
-package com.zong.web.dbclient.dao;
+package com.zong.zdb.dao;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
@@ -8,16 +8,16 @@ import java.sql.Statement;
 import java.util.HashMap;
 import java.util.Map;
 
-import com.zong.util.Properties;
+import com.zong.zdb.util.Properties;
 
 public class BaseJdbcDao {
+	protected static String driverClassName;
 	protected static String url;
-	protected static String user;
+	protected static String username;
 	protected static String password;
 	protected static String database;
-	protected static String driverClassName;
 	protected static String connKey;;
-	
+
 	// 数据库连接池
 	public static Map<String, Connection> conns = new HashMap<String, Connection>();
 	public static Connection conn;
@@ -26,13 +26,13 @@ public class BaseJdbcDao {
 	public static Statement st;
 
 	public BaseJdbcDao(Properties props) {
-		url = props.getProperty("jdbc.url");
-		user = props.getProperty("jdbc.username");
-		password = props.getProperty("jdbc.password");
-		String [] ss = url.split("\\?")[0].split("/");
-		database = ss[ss.length-1];
 		driverClassName = props.getProperty("jdbc.driverClassName");
-		connKey = driverClassName+url+user+password;
+		url = props.getProperty("jdbc.url");
+		username = props.getProperty("jdbc.username");
+		password = props.getProperty("jdbc.password");
+		String[] ss = url.split("\\?")[0].split("/");
+		database = ss[ss.length - 1];
+		connKey = driverClassName + url + username + password;
 	}
 
 	public BaseJdbcDao() {
@@ -46,13 +46,13 @@ public class BaseJdbcDao {
 			Class.forName(driverClassName);
 			if (conns.get(connKey) == null) {
 				// 根据数据库连接字符，名称，密码给conn赋值
-				conn = DriverManager.getConnection(url, user, password);
+				conn = DriverManager.getConnection(url, username, password);
 				conns.put(connKey, conn);
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-		//System.out.println(conns.get(connKey));
+		// System.out.println(conns.get(connKey));
 		return conns.get(connKey);
 	}
 }

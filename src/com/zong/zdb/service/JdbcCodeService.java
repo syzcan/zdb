@@ -1,15 +1,15 @@
-package com.zong.web.dbclient.service;
+package com.zong.zdb.service;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import com.zong.util.Properties;
-import com.zong.web.dbclient.bean.ColumnField;
-import com.zong.web.dbclient.bean.Table;
-import com.zong.web.dbclient.bean.TableEntity;
-import com.zong.web.dbclient.dao.IJdbcDao;
-import com.zong.web.dbclient.dao.MysqlCodeDao;
-import com.zong.web.dbclient.dao.OracleCodeDao;
+import com.zong.zdb.bean.ColumnField;
+import com.zong.zdb.bean.Table;
+import com.zong.zdb.bean.TableEntity;
+import com.zong.zdb.dao.IJdbcDao;
+import com.zong.zdb.dao.MysqlCodeDao;
+import com.zong.zdb.dao.OracleCodeDao;
+import com.zong.zdb.util.Properties;
 
 public class JdbcCodeService {
 	private static final String DRIVER_ORACLE = "oracle.jdbc.driver.OracleDriver";
@@ -33,6 +33,7 @@ public class JdbcCodeService {
 			Table table = new Table();
 			table.setTableName(tableEntity.getTableName());
 			table.setComment(tableEntity.getComment());
+			table.setTotalResult(tableEntity.getTotalResult());
 			tables.add(table);
 		}
 		return tables;
@@ -42,4 +43,5 @@ public class JdbcCodeService {
 		return makeJdbcDao(dbname).showTableColumns(tableName);
 	}
 
+	
 }

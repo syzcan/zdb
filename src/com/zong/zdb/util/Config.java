@@ -1,4 +1,4 @@
-package com.zong.util;
+package com.zong.zdb.util;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -11,6 +11,11 @@ import com.fasterxml.jackson.databind.ObjectMapper;
  * @date 2016年11月27日 下午10:48:35
  */
 public class Config {
+	public static final String JDBC_DRIVER = "jdbc.driverClassName";
+	public static final String JDBC_URL = "jdbc.url";
+	public static final String JDBC_USERNAME = "jdbc.username";
+	public static final String JDBC_PASSWORD = "jdbc.password";
+
 	public static final String CONFIG_DATA = "configData";
 	public static final String PACKAGE_NAME = "packageName";
 	public static final String PACKAGE_BEAN = "packageBean";
@@ -23,7 +28,7 @@ public class Config {
 
 	public static Map readConfig() throws Exception {
 		ObjectMapper mapper = new ObjectMapper();
-		configData = mapper.readValue(cutComment(FileUtils.readTxt(FileUtils.getClassResources() + "config.json")),
+		configData = mapper.readValue(cutComment(FileUtils.readTxt(FileUtils.getClassResources() + "zdb.json")),
 				HashMap.class);
 		return configData;
 	}

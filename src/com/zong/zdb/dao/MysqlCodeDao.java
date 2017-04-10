@@ -1,4 +1,4 @@
-package com.zong.web.dbclient.dao;
+package com.zong.zdb.dao;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -6,9 +6,9 @@ import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.zong.util.Properties;
-import com.zong.web.dbclient.bean.ColumnField;
-import com.zong.web.dbclient.bean.TableEntity;
+import com.zong.zdb.bean.ColumnField;
+import com.zong.zdb.bean.TableEntity;
+import com.zong.zdb.util.Properties;
 
 public class MysqlCodeDao extends BaseJdbcDao implements IJdbcDao {
 
@@ -38,7 +38,7 @@ public class MysqlCodeDao extends BaseJdbcDao implements IJdbcDao {
 				String columnType = rs.getString("DATA_TYPE");
 				String columnKey = rs.getString("COLUMN_KEY");
 				String canNull = rs.getString("IS_NULLABLE");
-				Integer dataLength = rs.getInt("CHARACTER_MAXIMUM_LENGTH");
+				Long dataLength = rs.getLong("CHARACTER_MAXIMUM_LENGTH");
 				Integer dataPrecision = rs.getInt("NUMERIC_PRECISION");
 				Integer dataScale = rs.getInt("NUMERIC_SCALE");
 				String defaultValue = rs.getString("COLUMN_DEFAULT");
@@ -97,7 +97,7 @@ public class MysqlCodeDao extends BaseJdbcDao implements IJdbcDao {
 	/**
 	 * 字段名转换为属性名，首字母小写，下划线后一个单词大写开头，然后取消下划线
 	 */
-	public static String transColumn(String column) {
+	private static String transColumn(String column) {
 		String[] names = column.split("_");
 		StringBuffer nameBuffer = new StringBuffer();
 		for (int i = 0; i < names.length; i++) {

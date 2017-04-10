@@ -1,4 +1,4 @@
-package com.zong.web.dbclient.dao;
+package com.zong.zdb.dao;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -6,9 +6,9 @@ import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.zong.util.Properties;
-import com.zong.web.dbclient.bean.ColumnField;
-import com.zong.web.dbclient.bean.TableEntity;
+import com.zong.zdb.bean.ColumnField;
+import com.zong.zdb.bean.TableEntity;
+import com.zong.zdb.util.Properties;
 
 /**
  * @desc
@@ -36,7 +36,7 @@ public class OracleCodeDao extends BaseJdbcDao implements IJdbcDao {
 		try {
 			st = (Statement) conn.createStatement(); // 创建用于执行静态sql语句的Statement对象，st属局部变量
 			String sql = "select * from DBA_TAB_COLUMNS where Table_Name='" + tableName + "' and lower(OWNER)=lower('"
-					+ user + "') ORDER BY COLUMN_ID";
+					+ username + "') ORDER BY COLUMN_ID";
 			ResultSet rs = st.executeQuery(sql); // 执行sql查询语句，返回查询数据的结果集
 
 			StringBuffer sb = new StringBuffer();
@@ -45,7 +45,7 @@ public class OracleCodeDao extends BaseJdbcDao implements IJdbcDao {
 				// 根据字段名获取相应的值
 				String column = rs.getString("COLUMN_NAME");
 				String columnType = rs.getString("DATA_TYPE");
-				Integer dataLength = rs.getInt("DATA_LENGTH");
+				Long dataLength = rs.getLong("DATA_LENGTH");
 				Integer dataPrecision = rs.getInt("DATA_PRECISION");
 				Integer dataScale = rs.getInt("DATA_SCALE");
 				String defaultValue = rs.getString("DATA_DEFAULT");
@@ -145,7 +145,7 @@ public class OracleCodeDao extends BaseJdbcDao implements IJdbcDao {
 	/**
 	 * 字段名转换为属性名，首字母小写，下划线后一个单词大写开头，然后取消下划线
 	 */
-	public static String transColumn(String column) {
+	private static String transColumn(String column) {
 		String[] names = column.split("_");
 		StringBuffer nameBuffer = new StringBuffer();
 		for (int i = 0; i < names.length; i++) {
