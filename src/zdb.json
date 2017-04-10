@@ -1,0 +1,20 @@
+{
+	#数据库连接配置
+	"dbs":[
+		{
+			"dbname": "dwr",
+			"jdbc.driverClassName": "com.mysql.jdbc.Driver",
+			"jdbc.url": "jdbc:mysql://localhost:3306/dwr",
+			"jdbc.username": "root",
+			"jdbc.password": "123456",
+			"jdbc.database": "dwr"
+		},
+		{
+			"dbname": "health",
+			"jdbc.driverClassName": "oracle.jdbc.driver.OracleDriver",
+			"jdbc.url": "jdbc:oracle:thin:@10.1.125.74:1521:ORCL",
+			"jdbc.username": "rpadmin",
+			"jdbc.password": "admin"
+		}
+	]
+}
