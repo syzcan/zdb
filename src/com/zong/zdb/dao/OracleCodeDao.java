@@ -31,7 +31,7 @@ public class OracleCodeDao extends BaseJdbcDao implements IJdbcDao {
 	public List<ColumnField> showTableColumns(String tableName) {
 		conn = getConnection(); // 同样先要获取连接，即连接到数据库.
 
-		List<ColumnField> list = new ArrayList<>();
+		List<ColumnField> list = new ArrayList<ColumnField>();
 		String result = "";
 		try {
 			st = (Statement) conn.createStatement(); // 创建用于执行静态sql语句的Statement对象，st属局部变量
@@ -108,7 +108,7 @@ public class OracleCodeDao extends BaseJdbcDao implements IJdbcDao {
 	public List<TableEntity> showTables() {
 		conn = getConnection(); // 同样先要获取连接，即连接到数据库.
 
-		List<TableEntity> list = new ArrayList<>();
+		List<TableEntity> list = new ArrayList<TableEntity>();
 		try {
 			String sql = "select * from user_tab_comments ORDER BY table_name";
 			st = (Statement) conn.createStatement(); // 创建用于执行静态sql语句的Statement对象，st属局部变量
