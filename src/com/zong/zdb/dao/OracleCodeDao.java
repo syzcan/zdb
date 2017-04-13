@@ -37,7 +37,7 @@ public class OracleCodeDao implements IJdbcDao {
 	 * 查询某个表的所有字段
 	 */
 	public List<ColumnField> showTableColumns(String tableName) {
-		List<ColumnField> list = new ArrayList<>();
+		List<ColumnField> list = new ArrayList<ColumnField>();
 		String result = "";
 		try {
 			st = (Statement) conn.createStatement(); // 创建用于执行静态sql语句的Statement对象，st属局部变量
@@ -112,7 +112,7 @@ public class OracleCodeDao implements IJdbcDao {
 	 * 获取当前用户所有表名
 	 */
 	public List<Table> showTables() {
-		List<Table> list = new ArrayList<>();
+		List<Table> list = new ArrayList<Table>();
 		try {
 			String sql = "select * from user_tab_comments ORDER BY table_name";
 			st = (Statement) conn.createStatement(); // 创建用于执行静态sql语句的Statement对象，st属局部变量
