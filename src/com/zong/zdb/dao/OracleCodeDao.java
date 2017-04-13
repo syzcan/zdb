@@ -1,5 +1,7 @@
 package com.zong.zdb.dao;
 
+import java.sql.Connection;
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
@@ -7,18 +9,24 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.zong.zdb.bean.ColumnField;
-import com.zong.zdb.bean.TableEntity;
-import com.zong.zdb.util.Properties;
+import com.zong.zdb.bean.Table;
 
 /**
  * @desc
  * @author zong
  * @date 2016年3月23日
  */
-public class OracleCodeDao extends BaseJdbcDao implements IJdbcDao {
+public class OracleCodeDao implements IJdbcDao {
 
-	public OracleCodeDao(Properties props) {
-		super(props);
+	public Connection conn;
+	public PreparedStatement ps;
+	public ResultSet rs;
+	public Statement st;
+	public String username;
+
+	public OracleCodeDao(String username, Connection conn) {
+		this.username = username;
+		this.conn = conn;
 	}
 
 	public OracleCodeDao() {
@@ -29,8 +37,6 @@ public class OracleCodeDao extends BaseJdbcDao implements IJdbcDao {
 	 * 查询某个表的所有字段
 	 */
 	public List<ColumnField> showTableColumns(String tableName) {
-		conn = getConnection(); // 同样先要获取连接，即连接到数据库.
-
 		List<ColumnField> list = new ArrayList<>();
 		String result = "";
 		try {
@@ -105,10 +111,8 @@ public class OracleCodeDao extends BaseJdbcDao implements IJdbcDao {
 	/**
 	 * 获取当前用户所有表名
 	 */
-	public List<TableEntity> showTables() {
-		conn = getConnection(); // 同样先要获取连接，即连接到数据库.
-
-		List<TableEntity> list = new ArrayList<>();
+	public List<Table> showTables() {
+		List<Table> list = new ArrayList<>();
 		try {
 			String sql = "select * from user_tab_comments ORDER BY table_name";
 			st = (Statement) conn.createStatement(); // 创建用于执行静态sql语句的Statement对象，st属局部变量
@@ -118,19 +122,19 @@ public class OracleCodeDao extends BaseJdbcDao implements IJdbcDao {
 				// 根据字段名获取相应的值
 				String tableName = rs.getString("TABLE_NAME");
 				String comment = rs.getString("COMMENTS");
-				TableEntity tableEntity = new TableEntity();
-				tableEntity.setTableName(tableName);
-				tableEntity.setComment(comment);
-				list.add(tableEntity);
+				Table table = new Table();
+				table.setTableName(tableName);
+				table.setComment(comment);
+				list.add(table);
 			}
 			sql = "select table_name,num_rows from user_tables ORDER BY num_rows desc";
 			rs = st.executeQuery(sql);
 			while (rs.next()) {
 				String tableName = rs.getString("TABLE_NAME");
 				int numRows = rs.getInt("NUM_ROWS");
-				for (TableEntity tableEntity : list) {
-					if (tableEntity.getTableName().equals(tableName)) {
-						tableEntity.setTotalResult(numRows);
+				for (Table table : list) {
+					if (table.getTableName().equals(tableName)) {
+						table.setTotalResult(numRows);
 					}
 				}
 			}
@@ -156,6 +160,39 @@ public class OracleCodeDao extends BaseJdbcDao implements IJdbcDao {
 			nameBuffer.append(name);
 		}
 		return nameBuffer.toString();
+	}
+
+	@Override
+	public Table showTable(String tableName) {
+		Table table = new Table();
+		try {
+			String sql = "select * from user_tab_comments ORDER BY table_name";
+			st = (Statement) conn.createStatement();
+			ResultSet rs = st.executeQuery(sql);
+
+			while (rs.next()) {
+				// 根据字段名获取相应的值
+				String TABLE_NAME = rs.getString("TABLE_NAME");
+				String comment = rs.getString("COMMENTS");
+				table.setTableName(TABLE_NAME);
+				table.setComment(comment);
+				table.setColumnFields(showTableColumns(tableName));
+			}
+			sql = "select table_name,num_rows from user_tables ORDER BY num_rows desc";
+			rs = st.executeQuery(sql);
+			while (rs.next()) {
+				String TABLE_NAME = rs.getString("TABLE_NAME");
+				int numRows = rs.getInt("NUM_ROWS");
+				if (table.getTableName().equals(TABLE_NAME)) {
+					table.setTotalResult(numRows);
+				}
+			}
+			// conn.close();
+		} catch (SQLException e) {
+			System.out.println("查询数据失败");
+			e.printStackTrace();
+		}
+		return table;
 	}
 
 }

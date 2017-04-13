@@ -1,5 +1,7 @@
 package com.zong.zdb.dao;
 
+import java.sql.Connection;
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
@@ -7,27 +9,28 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.zong.zdb.bean.ColumnField;
-import com.zong.zdb.bean.TableEntity;
-import com.zong.zdb.util.Properties;
+import com.zong.zdb.bean.Table;
 
-public class MysqlCodeDao extends BaseJdbcDao implements IJdbcDao {
+public class MysqlCodeDao implements IJdbcDao {
+	public Connection conn;
+	public PreparedStatement ps;
+	public ResultSet rs;
+	public Statement st;
+	public String database;
 
-	public MysqlCodeDao(Properties props) {
-		super(props);
-	}
-
-	public MysqlCodeDao() {
-
+	public MysqlCodeDao(String database, Connection conn) {
+		this.database = database;
+		this.conn = conn;
 	}
 
 	/**
 	 * 查询某个表的所有字段
 	 */
 	public List<ColumnField> showTableColumns(String tableName) {
-		conn = getConnection(); // 同样先要获取连接，即连接到数据库.
 		List<ColumnField> list = new ArrayList<ColumnField>();
 		try {
-			String sql = "select * from information_schema.columns where table_schema='" + database + "' and table_name='" + tableName + "'";
+			String sql = "select * from information_schema.columns where table_schema='" + database
+					+ "' and table_name='" + tableName + "'";
 			st = (Statement) conn.createStatement(); // 创建用于执行静态sql语句的Statement对象，st属局部变量
 			ResultSet rs = st.executeQuery(sql); // 执行sql查询语句，返回查询数据的结果集
 
@@ -56,7 +59,7 @@ public class MysqlCodeDao extends BaseJdbcDao implements IJdbcDao {
 				columnField.setType(columnType);
 				list.add(columnField);
 			}
-			//conn.close(); // 关闭数据库连接
+			// conn.close(); // 关闭数据库连接
 		} catch (SQLException e) {
 			System.out.println("查询数据失败");
 			e.printStackTrace();
@@ -67,12 +70,11 @@ public class MysqlCodeDao extends BaseJdbcDao implements IJdbcDao {
 	/**
 	 * 获取当前用户所有表名
 	 */
-	public List<TableEntity> showTables() {
-		conn = getConnection(); // 同样先要获取连接，即连接到数据库.
-
-		List<TableEntity> list = new ArrayList<TableEntity>();
+	public List<Table> showTables() {
+		List<Table> list = new ArrayList<Table>();
 		try {
-			String sql = "select table_name,table_comment,table_rows from information_schema.tables where table_schema='" + database + "' and table_type='BASE TABLE'";
+			String sql = "select table_name,table_comment,table_rows from information_schema.tables where table_schema='"
+					+ database + "' and table_type='BASE TABLE'";
 			st = (Statement) conn.createStatement(); // 创建用于执行静态sql语句的Statement对象，st属局部变量
 			ResultSet rs = st.executeQuery(sql); // 执行sql查询语句，返回查询数据的结果集
 
@@ -80,13 +82,13 @@ public class MysqlCodeDao extends BaseJdbcDao implements IJdbcDao {
 				String tableName = rs.getString("table_name");
 				String comment = rs.getString("table_comment");
 				int tableRows = rs.getInt("table_rows");
-				TableEntity tableEntity = new TableEntity();
-				tableEntity.setTableName(tableName);
-				tableEntity.setComment(dealComment(comment));
-				tableEntity.setTotalResult(tableRows);
-				list.add(tableEntity);
+				Table table = new Table();
+				table.setTableName(tableName);
+				table.setComment(dealComment(comment));
+				table.setTotalResult(tableRows);
+				list.add(table);
 			}
-			//conn.close(); // 关闭数据库连接
+			// conn.close(); // 关闭数据库连接
 		} catch (SQLException e) {
 			System.out.println("查询数据失败");
 			e.printStackTrace();
@@ -97,7 +99,7 @@ public class MysqlCodeDao extends BaseJdbcDao implements IJdbcDao {
 	/**
 	 * 字段名转换为属性名，首字母小写，下划线后一个单词大写开头，然后取消下划线
 	 */
-	private static String transColumn(String column) {
+	private String transColumn(String column) {
 		String[] names = column.split("_");
 		StringBuffer nameBuffer = new StringBuffer();
 		for (int i = 0; i < names.length; i++) {
@@ -110,7 +112,7 @@ public class MysqlCodeDao extends BaseJdbcDao implements IJdbcDao {
 		return nameBuffer.toString();
 	}
 
-	private static String dealComment(String comment) {
+	private String dealComment(String comment) {
 		if (comment.indexOf("InnoDB") >= 0) {
 			if (comment.indexOf(";") >= 0) {
 				comment = comment.substring(0, comment.lastIndexOf(";"));
@@ -119,6 +121,32 @@ public class MysqlCodeDao extends BaseJdbcDao implements IJdbcDao {
 			}
 		}
 		return comment;
+	}
+
+	@Override
+	public Table showTable(String tableName) {
+		Table table = new Table();
+		try {
+			String sql = "select table_name,table_comment,table_rows from information_schema.tables where table_schema='"
+					+ database + "' and table_type='BASE TABLE'";
+			st = (Statement) conn.createStatement(); // 创建用于执行静态sql语句的Statement对象，st属局部变量
+			ResultSet rs = st.executeQuery(sql); // 执行sql查询语句，返回查询数据的结果集
+
+			while (rs.next()) {
+				String table_name = rs.getString("table_name");
+				String table_comment = rs.getString("table_comment");
+				int table_rows = rs.getInt("table_rows");
+				table.setTableName(table_name);
+				table.setComment(dealComment(table_comment));
+				table.setTotalResult(table_rows);
+				table.setColumnFields(showTableColumns(tableName));
+			}
+			// conn.close(); // 关闭数据库连接
+		} catch (SQLException e) {
+			System.out.println("查询数据失败");
+			e.printStackTrace();
+		}
+		return table;
 	}
 
 }

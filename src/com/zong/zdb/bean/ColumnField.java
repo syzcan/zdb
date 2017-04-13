@@ -63,20 +63,7 @@ public class ColumnField {
 		return column;
 	}
 
-	/**
-	 * 字段名转换为属性名，首字母小写，下划线后一个单词大写开头，然后取消下划线
-	 */
 	public void setColumn(String column) {
-		String[] names = column.split("_");
-		StringBuffer nameBuffer = new StringBuffer();
-		for (int i = 0; i < names.length; i++) {
-			String name = names[i].toLowerCase();
-			if (i != 0) {
-				name = name.substring(0, 1).toUpperCase() + name.substring(1);
-			}
-			nameBuffer.append(name);
-		}
-		this.field = nameBuffer.toString();
 		this.column = column;
 	}
 
