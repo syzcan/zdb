@@ -47,7 +47,6 @@ public class MysqlCodeDao implements IJdbcDao {
 				String defaultValue = rs.getString("COLUMN_DEFAULT");
 				ColumnField columnField = new ColumnField();
 				columnField.setColumn(column);
-				columnField.setField(transColumn(column));
 				columnField.setColumnType(columnType);
 				columnField.setKey(columnKey);
 				columnField.setRemark(comment);
@@ -56,7 +55,9 @@ public class MysqlCodeDao implements IJdbcDao {
 				columnField.setDataPrecision(dataPrecision);
 				columnField.setDataScale(dataScale);
 				columnField.setDefaultValue(defaultValue);
-				columnField.setType(columnType);
+				// 转换字段和类型到java属性名和属性类型
+				columnField.transColumnToField(column);
+				columnField.transColumnType(columnType);
 				list.add(columnField);
 			}
 			// conn.close(); // 关闭数据库连接
@@ -75,8 +76,8 @@ public class MysqlCodeDao implements IJdbcDao {
 		try {
 			String sql = "select table_name,table_comment,table_rows from information_schema.tables where table_schema='"
 					+ database + "' and table_type='BASE TABLE'";
-			st = (Statement) conn.createStatement(); // 创建用于执行静态sql语句的Statement对象，st属局部变量
-			ResultSet rs = st.executeQuery(sql); // 执行sql查询语句，返回查询数据的结果集
+			st = (Statement) conn.createStatement();
+			ResultSet rs = st.executeQuery(sql);
 
 			while (rs.next()) {
 				String tableName = rs.getString("table_name");
@@ -96,22 +97,6 @@ public class MysqlCodeDao implements IJdbcDao {
 		return list;
 	}
 
-	/**
-	 * 字段名转换为属性名，首字母小写，下划线后一个单词大写开头，然后取消下划线
-	 */
-	private String transColumn(String column) {
-		String[] names = column.split("_");
-		StringBuffer nameBuffer = new StringBuffer();
-		for (int i = 0; i < names.length; i++) {
-			String name = names[i].toLowerCase();
-			if (i != 0) {
-				name = name.substring(0, 1).toUpperCase() + name.substring(1);
-			}
-			nameBuffer.append(name);
-		}
-		return nameBuffer.toString();
-	}
-
 	private String dealComment(String comment) {
 		if (comment.indexOf("InnoDB") >= 0) {
 			if (comment.indexOf(";") >= 0) {
@@ -128,15 +113,14 @@ public class MysqlCodeDao implements IJdbcDao {
 		Table table = new Table();
 		try {
 			String sql = "select table_name,table_comment,table_rows from information_schema.tables where table_schema='"
-					+ database + "' and table_type='BASE TABLE'";
-			st = (Statement) conn.createStatement(); // 创建用于执行静态sql语句的Statement对象，st属局部变量
-			ResultSet rs = st.executeQuery(sql); // 执行sql查询语句，返回查询数据的结果集
+					+ database + "' and table_type='BASE TABLE' and table_name='" + tableName + "'";
+			st = (Statement) conn.createStatement();
+			ResultSet rs = st.executeQuery(sql);
 
 			while (rs.next()) {
-				String table_name = rs.getString("table_name");
 				String table_comment = rs.getString("table_comment");
 				int table_rows = rs.getInt("table_rows");
-				table.setTableName(table_name);
+				table.setTableName(tableName);
 				table.setComment(dealComment(table_comment));
 				table.setTotalResult(table_rows);
 				table.setColumnFields(showTableColumns(tableName));

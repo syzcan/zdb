@@ -7,10 +7,12 @@ import java.util.List;
 import java.util.Map;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.zong.zdb.bean.Table;
 import com.zong.zdb.dao.IJdbcDao;
 import com.zong.zdb.dao.MysqlCodeDao;
 import com.zong.zdb.dao.OracleCodeDao;
 import com.zong.zdb.service.JdbcCodeService;
+import com.zong.zdb.service.TemplateRoot;
 
 /**
  * @desc 配置读取与写入
@@ -34,6 +36,7 @@ public class ZDBConfig {
 	public static final String PACKAGE_CONTROLLER = "packageController";
 	public static final String PACKAGE_JSP = "packageJsp";
 	public static final String DBS = "dbs";
+	@SuppressWarnings("rawtypes")
 	public static Map configData = new HashMap();;
 	public static ObjectMapper objectMapper = new ObjectMapper();
 
@@ -43,20 +46,22 @@ public class ZDBConfig {
 	 * @return
 	 * @throws Exception
 	 */
+	@SuppressWarnings({ "rawtypes" })
 	public static Map readConfig() throws Exception {
 		configData = objectMapper.readValue(cutComment(FileUtils.readTxt(FileUtils.getClassResources() + "zdb.json")),
 				Map.class);
-		List<Map> dbDatas = (List<Map>) configData.get(DBS);
 		initDataConns(configData);
 		return configData;
 	}
 
+	@SuppressWarnings("rawtypes")
 	public static Map readConfig(String json) throws Exception {
 		configData = objectMapper.readValue(cutComment(json), Map.class);
 		initDataConns(configData);
 		return configData;
 	}
 
+	@SuppressWarnings("rawtypes")
 	public static Map writeConfig(String json) throws Exception {
 		FileUtils.writeTxt(FileUtils.getClassResources() + "zdb.json", json);
 		configData = objectMapper.readValue(cutComment(json), Map.class);
@@ -75,6 +80,7 @@ public class ZDBConfig {
 		return sb.toString();
 	}
 
+	@SuppressWarnings("rawtypes")
 	public static Map setConfigData(Map config) {
 		configData = config;
 		try {
@@ -85,6 +91,7 @@ public class ZDBConfig {
 		return configData;
 	}
 
+	@SuppressWarnings("rawtypes")
 	public static Map getConfigData() {
 		if (configData == null) {
 			try {
@@ -100,6 +107,7 @@ public class ZDBConfig {
 	/**
 	 * 配置文件代码生成配置插入到每个数据库链接
 	 */
+	@SuppressWarnings({ "unchecked", "rawtypes" })
 	private static void initCodeConfig(Map configData) throws Exception {
 		List<Map> dbDatas = (List<Map>) configData.get(DBS);
 		if (dbDatas != null) {
@@ -117,6 +125,7 @@ public class ZDBConfig {
 	/**
 	 * 初始化数据库连接池
 	 */
+	@SuppressWarnings({ "unchecked", "rawtypes" })
 	private static void initDataConns(Map configData) {
 		List<Map> dbDatas = (List<Map>) configData.get(DBS);
 		if (dbDatas != null) {
@@ -146,6 +155,7 @@ public class ZDBConfig {
 
 	}
 
+	@SuppressWarnings({ "unchecked", "rawtypes" })
 	public static IJdbcDao getDao(String dbname) {
 		List<Map> dbDatas = (List<Map>) configData.get(DBS);
 		if (dbDatas != null) {
@@ -160,15 +170,13 @@ public class ZDBConfig {
 
 	public static void main(String[] args) {
 		try {
+			ZDBConfig.readConfig();
 			JdbcCodeService codeService = JdbcCodeService.getInstance();
-			codeService.setDriverClassName(DRIVER_MYSQL);
-			codeService.setUrl("jdbc:mysql://localhost:3306/dwr");
-			codeService.setUsername("root");
-			codeService.setPassword("123456");
-			System.out.println(
-					objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(codeService.currentTables()));
+			Table table = codeService.showTable("zsgr", "GW044_LNRBJ_JD");
+			TemplateRoot root = TemplateRoot.createTemplateRoot(table);
+			System.out.println(objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(root));
+			System.out.println(root.getPackageBeanPath());
 		} catch (Exception e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 	}
