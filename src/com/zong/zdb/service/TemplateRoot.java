@@ -53,7 +53,14 @@ public class TemplateRoot extends HashMap implements Map, Serializable {
 		root.put("packageService", packageName + ".service");
 		root.put("packageController", packageName + ".controller");
 		root.put("packageJsp", packageJsp == null ? "" : packageJsp);
-		root.put("table", table);
+		// root.put("table", table);
+		root.put("tableName", table.getTableName());
+		root.put("comment", table.getComment());
+		root.put("totalResult", table.getTotalResult());
+		root.put("columnFields", table.getColumnFields());
+		root.put("normalColumns", table.getNormalColumns());
+		root.put("primaryColumns", table.getPrimaryColumns());
+		root.put("primary", table.getPrimary());
 		root.put("objectName", objectName);
 		root.put("className", className);
 		root.put("importPackage", getImportPackage(table));

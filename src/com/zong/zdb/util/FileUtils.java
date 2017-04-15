@@ -9,15 +9,12 @@ import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.net.URL;
 
-import org.apache.log4j.Logger;
-
 /**
  * @desc 文件工具类
  * @author zong
  * @date 2016年11月26日 下午1:19:31
  */
 public class FileUtils {
-	private static final Logger logger = Logger.getLogger(FileUtils.class);
 
 	/**
 	 * 读取文本文件
@@ -28,7 +25,6 @@ public class FileUtils {
 	public static String readTxt(String filePath) {
 		StringBuffer sb = new StringBuffer();
 		try {
-			logger.info("读取文件：" + filePath);
 			File file = new File(filePath);
 			InputStreamReader read = new InputStreamReader(new FileInputStream(file), "UTF-8");
 			BufferedReader br = new BufferedReader(read);
@@ -38,7 +34,7 @@ public class FileUtils {
 			}
 			br.close();
 		} catch (Exception e) {
-			logger.error(e.toString(), e);
+			e.printStackTrace();
 		}
 		return sb.toString();
 	}
@@ -60,7 +56,7 @@ public class FileUtils {
 			bw.write(content);
 			bw.close();
 		} catch (Exception e) {
-			logger.error(e.toString(), e);
+			e.printStackTrace();
 		}
 	}
 

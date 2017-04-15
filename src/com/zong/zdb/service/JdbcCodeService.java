@@ -8,6 +8,8 @@ import java.util.Map;
 import com.zong.zdb.bean.ColumnField;
 import com.zong.zdb.bean.Table;
 import com.zong.zdb.dao.IJdbcDao;
+import com.zong.zdb.util.Page;
+import com.zong.zdb.util.PageData;
 import com.zong.zdb.util.ZDBConfig;
 
 public class JdbcCodeService {
@@ -63,6 +65,14 @@ public class JdbcCodeService {
 
 	public List<ColumnField> showTableColumns(String dbname, String tableName) {
 		return getDao(dbname).showTableColumns(tableName);
+	}
+
+	public List<PageData> showTableData(String dbname, Page page) {
+		return getDao(dbname).showTableDatas(page);
+	}
+
+	public List<PageData> showSqlData(String dbname, String sql) {
+		return getDao(dbname).showSqlDatas(sql);
 	}
 
 	public Table currentTable(String tableName) {

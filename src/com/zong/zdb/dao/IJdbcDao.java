@@ -4,6 +4,8 @@ import java.util.List;
 
 import com.zong.zdb.bean.ColumnField;
 import com.zong.zdb.bean.Table;
+import com.zong.zdb.util.Page;
+import com.zong.zdb.util.PageData;
 
 public interface IJdbcDao {
 	/**
@@ -22,4 +24,8 @@ public interface IJdbcDao {
 	 * @param tableName
 	 */
 	public Table showTable(String tableName);
+
+	public List<PageData> showTableDatas(Page page);
+
+	public List<PageData> showSqlDatas(String sql);
 }

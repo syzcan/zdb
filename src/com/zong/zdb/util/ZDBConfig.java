@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Map;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
 import com.zong.zdb.bean.Table;
 import com.zong.zdb.dao.IJdbcDao;
 import com.zong.zdb.dao.MysqlCodeDao;
@@ -105,24 +106,6 @@ public class ZDBConfig {
 	}
 
 	/**
-	 * 配置文件代码生成配置插入到每个数据库链接
-	 */
-	@SuppressWarnings({ "unchecked", "rawtypes" })
-	private static void initCodeConfig(Map configData) throws Exception {
-		List<Map> dbDatas = (List<Map>) configData.get(DBS);
-		if (dbDatas != null) {
-			for (Map data : dbDatas) {
-				data.put(ZDBConfig.PACKAGE_NAME, ZDBConfig.configData.get(ZDBConfig.PACKAGE_NAME));
-				data.put(ZDBConfig.PACKAGE_BEAN, ZDBConfig.configData.get(ZDBConfig.PACKAGE_BEAN));
-				data.put(ZDBConfig.PACKAGE_MAPPER, ZDBConfig.configData.get(ZDBConfig.PACKAGE_MAPPER));
-				data.put(ZDBConfig.PACKAGE_SERVICE, ZDBConfig.configData.get(ZDBConfig.PACKAGE_SERVICE));
-				data.put(ZDBConfig.PACKAGE_CONTROLLER, ZDBConfig.configData.get(ZDBConfig.PACKAGE_CONTROLLER));
-				data.put(ZDBConfig.PACKAGE_JSP, ZDBConfig.configData.get(ZDBConfig.PACKAGE_JSP));
-			}
-		}
-	}
-
-	/**
 	 * 初始化数据库连接池
 	 */
 	@SuppressWarnings({ "unchecked", "rawtypes" })
@@ -172,10 +155,13 @@ public class ZDBConfig {
 		try {
 			ZDBConfig.readConfig();
 			JdbcCodeService codeService = JdbcCodeService.getInstance();
-			Table table = codeService.showTable("zsgr", "GW044_LNRBJ_JD");
+			Table table = codeService.showTable("dwr", "article");
 			TemplateRoot root = TemplateRoot.createTemplateRoot(table);
-			System.out.println(objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(root));
-			System.out.println(root.getPackageBeanPath());
+			Page page = new Page();
+			page.setTable("article");
+			codeService.showTableData("dwr", page);
+			objectMapper.configure(SerializationFeature.WRITE_NULL_MAP_VALUES, false);
+			System.out.println(objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(codeService.showSqlData("dwr", "select * from sys_user")));
 		} catch (Exception e) {
 			e.printStackTrace();
 		}

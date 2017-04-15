@@ -3,6 +3,7 @@ package com.zong.zdb.dao;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
@@ -10,6 +11,8 @@ import java.util.List;
 
 import com.zong.zdb.bean.ColumnField;
 import com.zong.zdb.bean.Table;
+import com.zong.zdb.util.Page;
+import com.zong.zdb.util.PageData;
 
 /**
  * @desc
@@ -169,4 +172,68 @@ public class OracleCodeDao implements IJdbcDao {
 		return table;
 	}
 
+	public List<PageData> showTableDatas(Page page) {
+		List<PageData> list = new ArrayList<PageData>();
+		try {
+			String tableName = page.getTable();
+			String sql = "select * from " + tableName;
+			page.setTotalResult(count(sql));// 统计总数
+			// 分页，条件筛选
+			if (page.getPd().get("orderColumn") != null && !page.getPd().get("orderColumn").equals("")) {
+				sql += " order by " + page.getPd().get("orderColumn") + " " + page.getPd().get("orderType");
+			}
+			int offset = page.getCurrentResult() + 1;// oracle用rownum分页从1开始
+			String pageSql = "select * from (select u.*, rownum r from (" + sql + ") u where rownum<"
+					+ (offset + page.getShowCount()) + ") where r>=" + offset;
+			st = (Statement) conn.createStatement();
+			ResultSet rs = st.executeQuery(pageSql);
+			List<ColumnField> fields = showTableColumns(tableName);
+			while (rs.next()) {
+				PageData pd = new PageData();
+				for (ColumnField columnField : fields) {
+					pd.put(columnField.getColumn(), rs.getString(columnField.getColumn()));
+				}
+				list.add(pd);
+			}
+			// conn.close(); // 关闭数据库连接
+		} catch (SQLException e) {
+			System.out.println("查询数据失败");
+			e.printStackTrace();
+		}
+		page.setDatas(list);
+		return list;
+	}
+
+	private int count(String sql) throws SQLException {
+		int count = 0;
+		String countSql = "select count(*) " + sql.substring(sql.indexOf("from"));
+		st = (Statement) conn.createStatement();
+		ResultSet rs = st.executeQuery(countSql);
+		while (rs.next()) {
+			count = rs.getInt(1);
+		}
+		return count;
+	}
+
+	@Override
+	public List<PageData> showSqlDatas(String sql) {
+		List<PageData> list = new ArrayList<PageData>();
+		try {
+			st = (Statement) conn.createStatement();
+			ResultSet rs = st.executeQuery(sql);
+
+			while (rs.next()) {
+				PageData pd = new PageData();
+				for (int i = 1; i <= rs.getMetaData().getColumnCount(); i++) {
+					ResultSetMetaData metaData = rs.getMetaData();
+					pd.put(metaData.getColumnName(i), rs.getObject(metaData.getColumnName(i)));
+				}
+				list.add(pd);
+			}
+		} catch (SQLException e) {
+			System.out.println("查询数据失败");
+			e.printStackTrace();
+		}
+		return list;
+	}
 }

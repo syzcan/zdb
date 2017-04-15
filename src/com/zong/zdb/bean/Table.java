@@ -45,7 +45,7 @@ public class Table {
 
 	public void setColumnFields(List<ColumnField> columnFields) {
 		this.columnFields = columnFields;
-		//setNormalPrimaryColumns();
+		setNormalPrimaryColumns();
 	}
 
 	public List<ColumnField> getNormalColumns() {
