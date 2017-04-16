@@ -112,7 +112,7 @@ public class MysqlCodeDao implements IJdbcDao {
 
 	@Override
 	public Table showTable(String tableName) {
-		Table table = new Table();
+		Table table = null;
 		try {
 			String sql = "select table_name,table_comment,table_rows from information_schema.tables where table_schema='"
 					+ database + "' and table_type='BASE TABLE' and table_name='" + tableName + "'";
@@ -122,6 +122,7 @@ public class MysqlCodeDao implements IJdbcDao {
 			while (rs.next()) {
 				String table_comment = rs.getString("table_comment");
 				int table_rows = rs.getInt("table_rows");
+				table = new Table();
 				table.setTableName(tableName);
 				table.setComment(dealComment(table_comment));
 				table.setTotalResult(table_rows);

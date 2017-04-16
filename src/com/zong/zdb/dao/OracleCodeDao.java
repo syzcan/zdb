@@ -141,7 +141,7 @@ public class OracleCodeDao implements IJdbcDao {
 
 	@Override
 	public Table showTable(String tableName) {
-		Table table = new Table();
+		Table table = null;
 		try {
 			String sql = "select * from user_tab_comments where TABLE_NAME = '" + tableName + "'";
 			st = (Statement) conn.createStatement();
@@ -150,6 +150,7 @@ public class OracleCodeDao implements IJdbcDao {
 			while (rs.next()) {
 				// 根据字段名获取相应的值
 				String comment = rs.getString("COMMENTS");
+				table = new Table();
 				table.setTableName(tableName);
 				table.setComment(comment);
 				table.setColumnFields(showTableColumns(tableName));
