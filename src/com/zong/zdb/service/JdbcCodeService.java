@@ -75,6 +75,22 @@ public class JdbcCodeService {
 		return getDao(dbname).showSqlDatas(sql);
 	}
 
+	public void insert(String dbname, String tableName, PageData data) {
+		getDao(dbname).insert(tableName, data);
+	}
+
+	public void update(String dbname, String tableName, PageData data, PageData idPd) {
+		getDao(dbname).update(tableName, data, idPd);
+	}
+
+	public void createTable(String dbname, PageData tableData) {
+		getDao(dbname).createTable(tableData);
+	}
+
+	public void alterTable(String dbname, PageData tableData) {
+		getDao(dbname).alterTable(tableData);
+	}
+
 	public Table currentTable(String tableName) {
 		return getCurrentDBDao().showTable(tableName);
 	}

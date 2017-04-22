@@ -6,8 +6,11 @@ import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
+
+import org.apache.log4j.Logger;
 
 import com.zong.zdb.bean.ColumnField;
 import com.zong.zdb.bean.Table;
@@ -20,11 +23,12 @@ import com.zong.zdb.util.PageData;
  * @date 2016年3月23日
  */
 public class OracleCodeDao implements IJdbcDao {
-
+	private static final Logger logger = Logger.getLogger(MysqlCodeDao.class);
+	public static SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 	public Connection conn;
-	public PreparedStatement ps;
 	public ResultSet rs;
 	public Statement st;
+	public PreparedStatement pst;
 	public String username;
 
 	public OracleCodeDao(String username, Connection conn) {
@@ -32,19 +36,41 @@ public class OracleCodeDao implements IJdbcDao {
 		this.conn = conn;
 	}
 
-	public OracleCodeDao() {
-
+	/**
+	 * 关闭资源
+	 */
+	private void closeStatement() {
+		if (st != null) {
+			try {
+				st.close();
+			} catch (Exception e) {
+			}
+		}
+		if (rs != null) {
+			try {
+				st.close();
+			} catch (Exception e) {
+			}
+		}
+		if (pst != null) {
+			try {
+				pst.close();
+			} catch (Exception e) {
+			}
+		}
 	}
 
 	/**
 	 * 查询某个表的所有字段
 	 */
 	public List<ColumnField> showTableColumns(String tableName) {
+		int rowCount = 0;
 		List<ColumnField> list = new ArrayList<ColumnField>();
 		try {
 			st = (Statement) conn.createStatement(); // 创建用于执行静态sql语句的Statement对象，st属局部变量
-			String sql = "select * from DBA_TAB_COLUMNS where Table_Name='" + tableName + "' and lower(OWNER)=lower('"
-					+ username + "') ORDER BY COLUMN_ID";
+			String cols = "COLUMN_NAME,DATA_TYPE,DATA_LENGTH,DATA_PRECISION,DATA_SCALE,DATA_DEFAULT,NULLABLE";
+			String sql = "select " + cols + " from dba_tab_columns where table_name='" + tableName
+					+ "' and lower(OWNER)=lower('" + username + "') order by column_id";
 			ResultSet rs = st.executeQuery(sql); // 执行sql查询语句，返回查询数据的结果集
 
 			while (rs.next()) {
@@ -68,9 +94,14 @@ public class OracleCodeDao implements IJdbcDao {
 				columnField.transColumnToField(column);
 				columnField.transColumnType(columnType);
 				list.add(columnField);
+				rowCount++;
 			}
+			// sql日志
+			logger.debug("==>  Preparing: " + sql);
+			logger.debug("==>      Total: " + rowCount);
+			rowCount = 0;
 			// 查询字段备注
-			sql = "select * from user_col_comments where Table_Name='" + tableName + "'";
+			sql = "select COLUMN_NAME,COMMENTS from user_col_comments where table_name='" + tableName + "'";
 			rs = st.executeQuery(sql);
 			while (rs.next()) {
 				String column = rs.getString("COLUMN_NAME");
@@ -80,9 +111,14 @@ public class OracleCodeDao implements IJdbcDao {
 						columnField.setRemark(comment);
 					}
 				}
+				rowCount++;
 			}
+			// sql日志
+			logger.debug("==>  Preparing: " + sql);
+			logger.debug("==>      Total: " + rowCount);
+			rowCount = 0;
 			// 查询表主键
-			sql = "select cu.* from user_cons_columns cu, user_constraints au where cu.constraint_name = au.constraint_name and au.constraint_type = 'P' and au.table_name = '"
+			sql = "select cu.COLUMN_NAME from user_cons_columns cu, user_constraints au where cu.constraint_name = au.constraint_name and au.constraint_type = 'P' and au.table_name = '"
 					+ tableName + "' order by position";
 			rs = st.executeQuery(sql);
 			while (rs.next()) {
@@ -92,11 +128,17 @@ public class OracleCodeDao implements IJdbcDao {
 						columnField.setKey("PRI");
 					}
 				}
+				rowCount++;
 			}
+			// sql日志
+			logger.debug("==>  Preparing: " + sql);
+			logger.debug("==>      Total: " + rowCount);
 			// conn.close(); // 关闭数据库连接
 		} catch (SQLException e) {
-			System.out.println("查询数据失败");
-			e.printStackTrace();
+			logger.error("查询数据失败");
+			logger.error(e.toString(), e);
+		} finally {
+			closeStatement();
 		}
 		return list;
 	}
@@ -105,9 +147,10 @@ public class OracleCodeDao implements IJdbcDao {
 	 * 获取当前用户所有表名
 	 */
 	public List<Table> showTables() {
+		int rowCount = 0;
 		List<Table> list = new ArrayList<Table>();
 		try {
-			String sql = "select * from user_tab_comments ORDER BY table_name";
+			String sql = "select * from user_tab_comments order by table_name";
 			st = (Statement) conn.createStatement();
 			ResultSet rs = st.executeQuery(sql);
 
@@ -119,8 +162,13 @@ public class OracleCodeDao implements IJdbcDao {
 				table.setTableName(tableName);
 				table.setComment(comment);
 				list.add(table);
+				rowCount++;
 			}
-			sql = "select table_name,num_rows from user_tables ORDER BY num_rows desc";
+			// sql日志
+			logger.debug("==>  Preparing: " + sql);
+			logger.debug("==>      Total: " + rowCount);
+			rowCount = 0;
+			sql = "select table_name,num_rows from user_tables order by num_rows desc";
 			rs = st.executeQuery(sql);
 			while (rs.next()) {
 				String tableName = rs.getString("TABLE_NAME");
@@ -130,20 +178,27 @@ public class OracleCodeDao implements IJdbcDao {
 						table.setTotalResult(numRows);
 					}
 				}
+				rowCount++;
 			}
+			// sql日志
+			logger.debug("==>  Preparing: " + sql);
+			logger.debug("==>      Total: " + rowCount);
 			// conn.close(); // 关闭数据库连接
 		} catch (SQLException e) {
-			System.out.println("查询数据失败");
-			e.printStackTrace();
+			logger.error("查询数据失败");
+			logger.error(e.toString(), e);
+		} finally {
+			closeStatement();
 		}
 		return list;
 	}
 
 	@Override
 	public Table showTable(String tableName) {
+		int rowCount = 0;
 		Table table = null;
 		try {
-			String sql = "select * from user_tab_comments where TABLE_NAME = '" + tableName + "'";
+			String sql = "select * from user_tab_comments where table_name = '" + tableName + "'";
 			st = (Statement) conn.createStatement();
 			ResultSet rs = st.executeQuery(sql);
 
@@ -154,9 +209,14 @@ public class OracleCodeDao implements IJdbcDao {
 				table.setTableName(tableName);
 				table.setComment(comment);
 				table.setColumnFields(showTableColumns(tableName));
+				rowCount++;
 			}
-			sql = "select table_name,num_rows from user_tables where TABLE_NAME = '" + tableName
-					+ "' ORDER BY num_rows desc";
+			// sql日志
+			logger.debug("==>  Preparing: " + sql);
+			logger.debug("==>      Total: " + rowCount);
+			rowCount = 0;
+			sql = "select table_name,num_rows from user_tables where table_name = '" + tableName
+					+ "' order by num_rows desc";
 			rs = st.executeQuery(sql);
 			while (rs.next()) {
 				String TABLE_NAME = rs.getString("TABLE_NAME");
@@ -164,16 +224,23 @@ public class OracleCodeDao implements IJdbcDao {
 				if (table.getTableName().equals(TABLE_NAME)) {
 					table.setTotalResult(numRows);
 				}
+				rowCount++;
 			}
+			// sql日志
+			logger.debug("==>  Preparing: " + sql);
+			logger.debug("==>      Total: " + rowCount);
 			// conn.close();
 		} catch (SQLException e) {
-			System.out.println("查询数据失败");
-			e.printStackTrace();
+			logger.error("查询数据失败");
+			logger.error(e.toString(), e);
+		} finally {
+			closeStatement();
 		}
 		return table;
 	}
 
 	public List<PageData> showTableDatas(Page page) {
+		int rowCount = 0;
 		List<PageData> list = new ArrayList<PageData>();
 		try {
 			String tableName = page.getTable();
@@ -195,29 +262,41 @@ public class OracleCodeDao implements IJdbcDao {
 					pd.put(columnField.getColumn(), rs.getString(columnField.getColumn()));
 				}
 				list.add(pd);
+				rowCount++;
 			}
+			// sql日志
+			logger.debug("==>  Preparing: " + sql);
+			logger.debug("==>      Total: " + rowCount);
 			// conn.close(); // 关闭数据库连接
 		} catch (SQLException e) {
-			System.out.println("查询数据失败");
-			e.printStackTrace();
+			logger.error("查询数据失败");
+			logger.error(e.toString(), e);
+		} finally {
+			closeStatement();
 		}
 		page.setDatas(list);
 		return list;
 	}
 
 	private int count(String sql) throws SQLException {
+		int rowCount = 0;
 		int count = 0;
 		String countSql = "select count(*) " + sql.substring(sql.indexOf("from"));
 		st = (Statement) conn.createStatement();
 		ResultSet rs = st.executeQuery(countSql);
 		while (rs.next()) {
 			count = rs.getInt(1);
+			rowCount++;
 		}
+		// sql日志
+		logger.debug("==>  Preparing: " + sql);
+		logger.debug("==>      Total: " + rowCount);
 		return count;
 	}
 
 	@Override
 	public List<PageData> showSqlDatas(String sql) {
+		int rowCount = 0;
 		List<PageData> list = new ArrayList<PageData>();
 		try {
 			st = (Statement) conn.createStatement();
@@ -230,11 +309,128 @@ public class OracleCodeDao implements IJdbcDao {
 					pd.put(metaData.getColumnName(i), rs.getObject(metaData.getColumnName(i)));
 				}
 				list.add(pd);
+				rowCount++;
 			}
+			// sql日志
+			logger.debug("==>  Preparing: " + sql);
+			logger.debug("==>      Total: " + rowCount);
 		} catch (SQLException e) {
-			System.out.println("查询数据失败");
-			e.printStackTrace();
+			logger.error("查询数据失败");
+			logger.error(e.toString(), e);
+		} finally {
+			closeStatement();
 		}
 		return list;
+	}
+
+	@Override
+	public void insert(String tableName, PageData data) {
+		try {
+			// 拼接预编译sql
+			String sql = "insert into " + tableName + "(";
+			for (Object column : data.keySet()) {
+				sql += column + ",";
+			}
+			sql = sql.replaceAll(",$", "");
+			sql += ") values(";
+			for (int i = 0; i < data.keySet().size(); i++) {
+				sql += "?,";
+			}
+			sql = sql.replaceAll(",$", "");
+			sql += ")";
+			pst = conn.prepareStatement(sql);
+			StringBuffer params = new StringBuffer();
+			int index = 1;
+			// 参数赋值
+			for (Object column : data.keySet()) {
+				Object value = data.get(column);
+				if (value != null) {
+					String valueType = value.getClass().getName();
+					if (valueType == "java.util.Date") {
+						value = dateFormat.format(value);
+					}
+					pst.setString(index++, value.toString());
+					// 拼接参数记录日志
+					params.append(value + "(" + valueType + "),");
+				} else {
+					pst.setString(index++, null);
+					// 拼接参数记录日志
+					params.append("null,");
+				}
+			}
+			int rowCount = pst.executeUpdate();
+			// sql日志
+			logger.debug("==>   Preparing: " + sql);
+			logger.debug("==>  Parameters: " + params.toString().replaceAll(",$", ""));
+			logger.debug("==>       Total: " + rowCount);
+		} catch (SQLException e) {
+			logger.error("插入数据失败");
+			logger.error(e.toString(), e);
+		} finally {
+			closeStatement();
+		}
+	}
+
+	@Override
+	public void update(String tableName, PageData data, PageData idPd) {
+		try {
+			// 拼接预编译sql
+			String sql = "update " + tableName + " set ";
+			for (Object column : data.keySet()) {
+				sql += column + "=?,";
+			}
+			sql = sql.replaceAll(",$", "");
+			sql += " where 1=1 ";
+			for (Object column : idPd.keySet()) {
+				Object value = idPd.get(column);
+				if (value != null && value.getClass().getName() == "java.util.Date") {
+					value = dateFormat.format(value);
+				}
+				sql += " and " + column + "='" + value + "',";
+			}
+			sql = sql.replaceAll(",$", "");
+			pst = conn.prepareStatement(sql);
+			StringBuffer params = new StringBuffer();
+			int index = 1;
+			// 参数赋值
+			for (Object column : data.keySet()) {
+				Object value = data.get(column);
+				if (value != null) {
+					String valueType = value.getClass().getName();
+					if (valueType == "java.util.Date") {
+						value = dateFormat.format(value);
+					}
+					pst.setString(index++, value.toString());
+					// 拼接参数记录日志
+					params.append(value + "(" + valueType + "),");
+				} else {
+					pst.setString(index++, null);
+					// 拼接参数记录日志
+					params.append("null,");
+				}
+			}
+			int rowCount = pst.executeUpdate();
+			// sql日志
+			logger.debug("==>   Preparing: " + sql);
+			logger.debug("==>  Parameters: " + params.toString().replaceAll(",$", ""));
+			logger.debug("==>       Total: " + rowCount);
+		} catch (SQLException e) {
+			logger.error("更新数据失败");
+			logger.error(e.toString(), e);
+		} finally {
+			closeStatement();
+		}
+	}
+
+	@Override
+	public boolean createTable(PageData tableData) {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
+	@Override
+	public boolean alterTable(PageData tableData) {
+		// TODO Auto-generated method stub
+		return false;
 	}
 }
