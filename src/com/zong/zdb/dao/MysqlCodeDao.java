@@ -71,7 +71,8 @@ public class MysqlCodeDao implements IJdbcDao {
 				// 根据字段名获取相应的值
 				String column = rs.getString("COLUMN_NAME");
 				String comment = rs.getString("COLUMN_COMMENT");
-				String columnType = rs.getString("DATA_TYPE");
+				String columnType = rs.getString("COLUMN_TYPE");//mysql才有这个
+				String dataType = rs.getString("DATA_TYPE");
 				String columnKey = rs.getString("COLUMN_KEY");
 				String canNull = rs.getString("IS_NULLABLE");
 				Long dataLength = rs.getLong("CHARACTER_MAXIMUM_LENGTH");
@@ -80,7 +81,8 @@ public class MysqlCodeDao implements IJdbcDao {
 				String defaultValue = rs.getString("COLUMN_DEFAULT");
 				ColumnField columnField = new ColumnField();
 				columnField.setColumn(column);
-				columnField.setColumnType(columnType);
+				columnField.setColumnType(dataType);
+				columnField.setDataType(dataType);
 				columnField.setKey(columnKey);
 				columnField.setRemark(comment);
 				columnField.setCanNull(canNull);
@@ -90,7 +92,7 @@ public class MysqlCodeDao implements IJdbcDao {
 				columnField.setDefaultValue(defaultValue);
 				// 转换字段和类型到java属性名和属性类型
 				columnField.transColumnToField(column);
-				columnField.transColumnType(columnType);
+				columnField.transColumnType(dataType);
 				list.add(columnField);
 				rowCount++;
 			}

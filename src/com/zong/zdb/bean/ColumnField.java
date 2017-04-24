@@ -23,9 +23,13 @@ public class ColumnField {
 	 */
 	private String column;
 	/**
-	 * 字段定义类型
+	 * mysql字段定义information_schema.COLUMNS才有这个字段，保存的是varchar(255)这种包含括号
 	 */
 	private String columnType;
+	/**
+	 * 字段定义类型，varchar、int、varchar2、date、number..
+	 */
+	private String dataType;
 	/**
 	 * 数据最多长度
 	 */
@@ -97,6 +101,14 @@ public class ColumnField {
 
 	public void setColumnType(String columnType) {
 		this.columnType = columnType;
+	}
+
+	public String getDataType() {
+		return dataType;
+	}
+
+	public void setDataType(String dataType) {
+		this.dataType = dataType;
 	}
 
 	public Long getDataLength() {
@@ -173,8 +185,8 @@ public class ColumnField {
 	/**
 	 * 数据库字段类型匹配为实体属性类型 jdbcType、javaType
 	 */
-	public void transColumnType(String columnType) {
-		String javaType = columnType.toLowerCase();
+	public void transColumnType(String dataType) {
+		String javaType = dataType.toLowerCase();
 		String jdbcType = "";
 		if (javaType.matches(".*((char)|(varchar)|(text)|(mediumtext)|(longtext)).*")) {
 			javaType = "String";

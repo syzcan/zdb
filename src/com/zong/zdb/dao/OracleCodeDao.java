@@ -76,7 +76,7 @@ public class OracleCodeDao implements IJdbcDao {
 			while (rs.next()) {
 				// 根据字段名获取相应的值
 				String column = rs.getString("COLUMN_NAME");
-				String columnType = rs.getString("DATA_TYPE");
+				String dataType = rs.getString("DATA_TYPE");
 				Long dataLength = rs.getLong("DATA_LENGTH");
 				Integer dataPrecision = rs.getInt("DATA_PRECISION");
 				Integer dataScale = rs.getInt("DATA_SCALE");
@@ -84,7 +84,7 @@ public class OracleCodeDao implements IJdbcDao {
 				String canNull = rs.getString("NULLABLE").equals("Y") ? "YES" : "NO";
 				ColumnField columnField = new ColumnField();
 				columnField.setColumn(column);
-				columnField.setColumnType(columnType);
+				columnField.setDataType(dataType);
 				columnField.setDataLength(dataLength);
 				columnField.setDataPrecision(dataPrecision);
 				columnField.setDataScale(dataScale);
@@ -92,7 +92,7 @@ public class OracleCodeDao implements IJdbcDao {
 				columnField.setCanNull(canNull);
 				// 转换字段和类型到java属性名和属性类型
 				columnField.transColumnToField(column);
-				columnField.transColumnType(columnType);
+				columnField.transColumnType(dataType);
 				list.add(columnField);
 				rowCount++;
 			}
@@ -425,12 +425,14 @@ public class OracleCodeDao implements IJdbcDao {
 	@Override
 	public boolean createTable(PageData tableData) {
 		// TODO Auto-generated method stub
+		logger.warn("尚未开发");
 		return false;
 	}
 
 	@Override
 	public boolean alterTable(PageData tableData) {
 		// TODO Auto-generated method stub
+		logger.warn("尚未开发");
 		return false;
 	}
 }
