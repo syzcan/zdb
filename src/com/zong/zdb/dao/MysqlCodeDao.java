@@ -61,7 +61,7 @@ public class MysqlCodeDao implements IJdbcDao {
 		Statement st = null;
 		PreparedStatement pst = null;
 		try {
-			String cols = "COLUMN_NAME,COLUMN_COMMENT,DATA_TYPE,COLUMN_KEY,IS_NULLABLE,CHARACTER_MAXIMUM_LENGTH,NUMERIC_PRECISION,NUMERIC_SCALE,COLUMN_DEFAULT";
+			String cols = "COLUMN_NAME,COLUMN_COMMENT,COLUMN_TYPE,DATA_TYPE,COLUMN_KEY,IS_NULLABLE,CHARACTER_MAXIMUM_LENGTH,NUMERIC_PRECISION,NUMERIC_SCALE,COLUMN_DEFAULT";
 			String sql = "select " + cols + " from information_schema.columns where table_schema='" + database
 					+ "' and table_name='" + tableName + "'";
 			st = (Statement) conn.createStatement(); // 创建用于执行静态sql语句的Statement对象，st属局部变量
@@ -81,7 +81,7 @@ public class MysqlCodeDao implements IJdbcDao {
 				String defaultValue = rs.getString("COLUMN_DEFAULT");
 				ColumnField columnField = new ColumnField();
 				columnField.setColumn(column);
-				columnField.setColumnType(dataType);
+				columnField.setColumnType(columnType);
 				columnField.setDataType(dataType);
 				columnField.setKey(columnKey);
 				columnField.setRemark(comment);
