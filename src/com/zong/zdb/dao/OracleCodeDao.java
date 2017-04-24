@@ -98,7 +98,7 @@ public class OracleCodeDao implements IJdbcDao {
 			}
 			// sql日志
 			logger.debug("==>  Preparing: " + sql);
-			logger.debug("==>      Total: " + rowCount);
+			logger.debug("<==      Total: " + rowCount);
 			rowCount = 0;
 			// 查询字段备注
 			sql = "select COLUMN_NAME,COMMENTS from user_col_comments where table_name='" + tableName + "'";
@@ -115,7 +115,7 @@ public class OracleCodeDao implements IJdbcDao {
 			}
 			// sql日志
 			logger.debug("==>  Preparing: " + sql);
-			logger.debug("==>      Total: " + rowCount);
+			logger.debug("<==      Total: " + rowCount);
 			rowCount = 0;
 			// 查询表主键
 			sql = "select cu.COLUMN_NAME from user_cons_columns cu, user_constraints au where cu.constraint_name = au.constraint_name and au.constraint_type = 'P' and au.table_name = '"
@@ -132,7 +132,7 @@ public class OracleCodeDao implements IJdbcDao {
 			}
 			// sql日志
 			logger.debug("==>  Preparing: " + sql);
-			logger.debug("==>      Total: " + rowCount);
+			logger.debug("<==      Total: " + rowCount);
 			// conn.close(); // 关闭数据库连接
 		} catch (SQLException e) {
 			logger.error("查询数据失败");
@@ -166,7 +166,7 @@ public class OracleCodeDao implements IJdbcDao {
 			}
 			// sql日志
 			logger.debug("==>  Preparing: " + sql);
-			logger.debug("==>      Total: " + rowCount);
+			logger.debug("<==      Total: " + rowCount);
 			rowCount = 0;
 			sql = "select table_name,num_rows from user_tables order by num_rows desc";
 			rs = st.executeQuery(sql);
@@ -182,7 +182,7 @@ public class OracleCodeDao implements IJdbcDao {
 			}
 			// sql日志
 			logger.debug("==>  Preparing: " + sql);
-			logger.debug("==>      Total: " + rowCount);
+			logger.debug("<==      Total: " + rowCount);
 			// conn.close(); // 关闭数据库连接
 		} catch (SQLException e) {
 			logger.error("查询数据失败");
@@ -213,7 +213,7 @@ public class OracleCodeDao implements IJdbcDao {
 			}
 			// sql日志
 			logger.debug("==>  Preparing: " + sql);
-			logger.debug("==>      Total: " + rowCount);
+			logger.debug("<==      Total: " + rowCount);
 			rowCount = 0;
 			sql = "select table_name,num_rows from user_tables where table_name = '" + tableName
 					+ "' order by num_rows desc";
@@ -228,7 +228,7 @@ public class OracleCodeDao implements IJdbcDao {
 			}
 			// sql日志
 			logger.debug("==>  Preparing: " + sql);
-			logger.debug("==>      Total: " + rowCount);
+			logger.debug("<==      Total: " + rowCount);
 			// conn.close();
 		} catch (SQLException e) {
 			logger.error("查询数据失败");
@@ -266,7 +266,7 @@ public class OracleCodeDao implements IJdbcDao {
 			}
 			// sql日志
 			logger.debug("==>  Preparing: " + sql);
-			logger.debug("==>      Total: " + rowCount);
+			logger.debug("<==      Total: " + rowCount);
 			// conn.close(); // 关闭数据库连接
 		} catch (SQLException e) {
 			logger.error("查询数据失败");
@@ -290,7 +290,7 @@ public class OracleCodeDao implements IJdbcDao {
 		}
 		// sql日志
 		logger.debug("==>  Preparing: " + sql);
-		logger.debug("==>      Total: " + rowCount);
+		logger.debug("<==      Total: " + rowCount);
 		return count;
 	}
 
@@ -313,7 +313,7 @@ public class OracleCodeDao implements IJdbcDao {
 			}
 			// sql日志
 			logger.debug("==>  Preparing: " + sql);
-			logger.debug("==>      Total: " + rowCount);
+			logger.debug("<==      Total: " + rowCount);
 		} catch (SQLException e) {
 			logger.error("查询数据失败");
 			logger.error(e.toString(), e);
@@ -362,7 +362,7 @@ public class OracleCodeDao implements IJdbcDao {
 			// sql日志
 			logger.debug("==>   Preparing: " + sql);
 			logger.debug("==>  Parameters: " + params.toString().replaceAll(",$", ""));
-			logger.debug("==>       Total: " + rowCount);
+			logger.debug("<==       Total: " + rowCount);
 		} catch (SQLException e) {
 			logger.error("插入数据失败");
 			logger.error(e.toString(), e);
@@ -413,7 +413,7 @@ public class OracleCodeDao implements IJdbcDao {
 			// sql日志
 			logger.debug("==>   Preparing: " + sql);
 			logger.debug("==>  Parameters: " + params.toString().replaceAll(",$", ""));
-			logger.debug("==>       Total: " + rowCount);
+			logger.debug("<==       Total: " + rowCount);
 		} catch (SQLException e) {
 			logger.error("更新数据失败");
 			logger.error(e.toString(), e);

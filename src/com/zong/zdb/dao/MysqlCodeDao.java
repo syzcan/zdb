@@ -98,7 +98,7 @@ public class MysqlCodeDao implements IJdbcDao {
 			}
 			// sql日志
 			logger.debug("==>  Preparing: " + sql);
-			logger.debug("==>      Total: " + rowCount);
+			logger.debug("<==      Total: " + rowCount);
 			// conn.close(); // 关闭数据库连接
 		} catch (SQLException e) {
 			logger.error("查询数据失败");
@@ -138,7 +138,7 @@ public class MysqlCodeDao implements IJdbcDao {
 			}
 			// sql日志
 			logger.debug("==>  Preparing: " + sql);
-			logger.debug("==>      Total: " + rowCount);
+			logger.debug("<==      Total: " + rowCount);
 			// conn.close(); // 关闭数据库连接
 		} catch (SQLException e) {
 			logger.error("查询数据失败");
@@ -185,7 +185,7 @@ public class MysqlCodeDao implements IJdbcDao {
 			}
 			// sql日志
 			logger.debug("==>  Preparing: " + sql);
-			logger.debug("==>      Total: " + rowCount);
+			logger.debug("<==      Total: " + rowCount);
 			// conn.close(); // 关闭数据库连接
 		} catch (SQLException e) {
 			logger.error("查询数据失败");
@@ -225,7 +225,7 @@ public class MysqlCodeDao implements IJdbcDao {
 			}
 			// sql日志
 			logger.debug("==>  Preparing: " + sql);
-			logger.debug("==>      Total: " + rowCount);
+			logger.debug("<==      Total: " + rowCount);
 			// conn.close(); // 关闭数据库连接
 		} catch (SQLException e) {
 			logger.error("查询数据失败");
@@ -278,7 +278,7 @@ public class MysqlCodeDao implements IJdbcDao {
 			}
 			// sql日志
 			logger.debug("==>  Preparing: " + sql);
-			logger.debug("==>      Total: " + rowCount);
+			logger.debug("<==      Total: " + rowCount);
 		} catch (SQLException e) {
 			logger.error("查询数据失败");
 			logger.error(e.toString(), e);
@@ -330,7 +330,7 @@ public class MysqlCodeDao implements IJdbcDao {
 			// sql日志
 			logger.debug("==>   Preparing: " + sql);
 			logger.debug("==>  Parameters: " + params.toString().replaceAll(",$", ""));
-			logger.debug("==>       Total: " + rowCount);
+			logger.debug("<==       Total: " + rowCount);
 		} catch (SQLException e) {
 			logger.error("插入数据失败");
 			logger.error(e.toString(), e);
@@ -384,7 +384,7 @@ public class MysqlCodeDao implements IJdbcDao {
 			// sql日志
 			logger.debug("==>   Preparing: " + sql);
 			logger.debug("==>  Parameters: " + params.toString().replaceAll(",$", ""));
-			logger.debug("==>       Total: " + rowCount);
+			logger.debug("<==       Total: " + rowCount);
 		} catch (SQLException e) {
 			logger.error("更新数据失败");
 			logger.error(e.toString(), e);
