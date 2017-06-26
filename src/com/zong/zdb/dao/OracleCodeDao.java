@@ -69,8 +69,10 @@ public class OracleCodeDao implements IJdbcDao {
 		try {
 			st = (Statement) conn.createStatement(); // 创建用于执行静态sql语句的Statement对象，st属局部变量
 			String cols = "COLUMN_NAME,DATA_TYPE,DATA_LENGTH,DATA_PRECISION,DATA_SCALE,DATA_DEFAULT,NULLABLE";
-			String sql = "select " + cols + " from dba_tab_columns where table_name='" + tableName
+			String sql = "select " + cols + " from sys.all_tab_columns where table_name='" + tableName
 					+ "' and lower(OWNER)=lower('" + username + "') order by column_id";
+//			String sql = "select " + cols + " from dba_tab_columns where table_name='" + tableName
+//					+ "' and lower(OWNER)=lower('" + username + "') order by column_id";
 			ResultSet rs = st.executeQuery(sql); // 执行sql查询语句，返回查询数据的结果集
 
 			while (rs.next()) {
