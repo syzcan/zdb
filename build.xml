@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project name="zdb" default="jar" basedir=".">
+	<property name="src.dir" value="src" />
+	<property name="lib.dir" value="lib" />
+	<property name="classes.dir" value="classes" />
+	<!--第三方jar-->
+	<path id="classpath">
+		<fileset dir="${lib.dir}">
+			<include name="*.jar" />
+		</fileset>
+	</path>
+	<!-- 1. 初始化工作，如创建目录等 -->
+	<target name="init">
+		<delete dir="${classes.dir}" />
+		<mkdir dir="${classes.dir}" />
+	</target>
+	<!-- 2. 编译 -->
+	<target name="compile" depends="init">
+		<javac srcdir="${src.dir}" destdir="${classes.dir}">
+			<compilerarg line="-encoding UTF-8" />
+			<classpath refid="classpath" />
+		</javac>
+	</target>
+	<!-- 3. 打包jar文件 -->
+	<target name="jar" depends="compile">
+		<!-- jar文件的输出路径 -->
+		<jar destfile="${classes.dir}/zdb.jar" basedir="${classes.dir}">
+		</jar>
+	</target>
+</project>

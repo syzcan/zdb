@@ -12,6 +12,7 @@ import com.zong.zdb.bean.Table;
 import com.zong.zdb.dao.IJdbcDao;
 import com.zong.zdb.dao.MysqlCodeDao;
 import com.zong.zdb.dao.OracleCodeDao;
+import com.zong.zdb.dao.SqlserverCodeDao;
 import com.zong.zdb.service.JdbcCodeService;
 import com.zong.zdb.service.TemplateRoot;
 
@@ -23,6 +24,7 @@ import com.zong.zdb.service.TemplateRoot;
 public class ZDBConfig {
 	public static final String DRIVER_ORACLE = "oracle.jdbc.driver.OracleDriver";
 	public static final String DRIVER_MYSQL = "com.mysql.jdbc.Driver";
+	public static final String DRIVER_MSSQL = "com.microsoft.sqlserver.jdbc.SQLServerDriver";
 
 	public static final String JDBC_DRIVER = "jdbc.driverClassName";
 	public static final String JDBC_URL = "jdbc.url";
@@ -128,6 +130,8 @@ public class ZDBConfig {
 						dao = new MysqlCodeDao(database, conn);
 					} else if (driverClassName.equals(DRIVER_ORACLE)) {
 						dao = new OracleCodeDao(username, conn);
+					} else if(driverClassName.equals(DRIVER_MSSQL)) {
+						dao = new SqlserverCodeDao(conn);
 					}
 				} catch (Exception e) {
 					e.printStackTrace();
