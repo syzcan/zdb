@@ -26,9 +26,6 @@ public class OracleCodeDao implements IJdbcDao {
 	private static final Logger logger = Logger.getLogger(MysqlCodeDao.class);
 	public static SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 	public Connection conn;
-	public ResultSet rs;
-	public Statement st;
-	public PreparedStatement pst;
 	public String username;
 
 	public OracleCodeDao(String username, Connection conn) {
@@ -39,7 +36,7 @@ public class OracleCodeDao implements IJdbcDao {
 	/**
 	 * 关闭资源
 	 */
-	private void closeStatement() {
+	private void closeStatement(ResultSet rs, Statement st, PreparedStatement pst) {
 		if (st != null) {
 			try {
 				st.close();
@@ -48,7 +45,7 @@ public class OracleCodeDao implements IJdbcDao {
 		}
 		if (rs != null) {
 			try {
-				st.close();
+				rs.close();
 			} catch (Exception e) {
 			}
 		}
@@ -66,6 +63,9 @@ public class OracleCodeDao implements IJdbcDao {
 	public List<ColumnField> showTableColumns(String tableName) {
 		int rowCount = 0;
 		List<ColumnField> list = new ArrayList<ColumnField>();
+		ResultSet rs = null;
+		Statement st = null;
+		PreparedStatement pst = null;
 		try {
 			st = (Statement) conn.createStatement(); // 创建用于执行静态sql语句的Statement对象，st属局部变量
 			String cols = "COLUMN_NAME,DATA_TYPE,DATA_LENGTH,DATA_PRECISION,DATA_SCALE,DATA_DEFAULT,NULLABLE";
@@ -73,7 +73,7 @@ public class OracleCodeDao implements IJdbcDao {
 					+ "' and lower(OWNER)=lower('" + username + "') order by column_id";
 //			String sql = "select " + cols + " from dba_tab_columns where table_name='" + tableName
 //					+ "' and lower(OWNER)=lower('" + username + "') order by column_id";
-			ResultSet rs = st.executeQuery(sql); // 执行sql查询语句，返回查询数据的结果集
+			rs = st.executeQuery(sql); // 执行sql查询语句，返回查询数据的结果集
 
 			while (rs.next()) {
 				// 根据字段名获取相应的值
@@ -98,6 +98,7 @@ public class OracleCodeDao implements IJdbcDao {
 				list.add(columnField);
 				rowCount++;
 			}
+			rs.close();
 			// sql日志
 			logger.debug("==>  Preparing: " + sql);
 			logger.debug("<==      Total: " + rowCount);
@@ -115,6 +116,7 @@ public class OracleCodeDao implements IJdbcDao {
 				}
 				rowCount++;
 			}
+			rs.close();
 			// sql日志
 			logger.debug("==>  Preparing: " + sql);
 			logger.debug("<==      Total: " + rowCount);
@@ -140,7 +142,7 @@ public class OracleCodeDao implements IJdbcDao {
 			logger.error("查询数据失败");
 			logger.error(e.toString(), e);
 		} finally {
-			closeStatement();
+			closeStatement(rs, st, pst);
 		}
 		return list;
 	}
@@ -151,10 +153,13 @@ public class OracleCodeDao implements IJdbcDao {
 	public List<Table> showTables() {
 		int rowCount = 0;
 		List<Table> list = new ArrayList<Table>();
+		ResultSet rs = null;
+		Statement st = null;
+		PreparedStatement pst = null;
 		try {
 			String sql = "select * from user_tab_comments order by table_name";
 			st = (Statement) conn.createStatement();
-			ResultSet rs = st.executeQuery(sql);
+			rs = st.executeQuery(sql);
 
 			while (rs.next()) {
 				// 根据字段名获取相应的值
@@ -166,11 +171,12 @@ public class OracleCodeDao implements IJdbcDao {
 				list.add(table);
 				rowCount++;
 			}
+			rs.close();
 			// sql日志
 			logger.debug("==>  Preparing: " + sql);
 			logger.debug("<==      Total: " + rowCount);
 			rowCount = 0;
-			sql = "select table_name,num_rows from user_tables order by num_rows desc";
+			sql = "select TABLE_NAME,NUM_ROWS from user_tables order by num_rows desc";
 			rs = st.executeQuery(sql);
 			while (rs.next()) {
 				String tableName = rs.getString("TABLE_NAME");
@@ -190,7 +196,7 @@ public class OracleCodeDao implements IJdbcDao {
 			logger.error("查询数据失败");
 			logger.error(e.toString(), e);
 		} finally {
-			closeStatement();
+			closeStatement(rs, st, pst);
 		}
 		return list;
 	}
@@ -199,10 +205,13 @@ public class OracleCodeDao implements IJdbcDao {
 	public Table showTable(String tableName) {
 		int rowCount = 0;
 		Table table = null;
+		ResultSet rs = null;
+		Statement st = null;
+		PreparedStatement pst = null;
 		try {
 			String sql = "select * from user_tab_comments where table_name = '" + tableName + "'";
 			st = (Statement) conn.createStatement();
-			ResultSet rs = st.executeQuery(sql);
+			rs = st.executeQuery(sql);
 
 			while (rs.next()) {
 				// 根据字段名获取相应的值
@@ -213,12 +222,13 @@ public class OracleCodeDao implements IJdbcDao {
 				table.setColumnFields(showTableColumns(tableName));
 				rowCount++;
 			}
+			rs.close();
 			// sql日志
 			logger.debug("==>  Preparing: " + sql);
 			logger.debug("<==      Total: " + rowCount);
 			rowCount = 0;
-			sql = "select table_name,num_rows from user_tables where table_name = '" + tableName
-					+ "' order by num_rows desc";
+			sql = "select TABLE_NAME,NUM_ROWS from user_tables where table_name = '" + tableName
+					+ "' order by NUM_ROWS desc";
 			rs = st.executeQuery(sql);
 			while (rs.next()) {
 				String TABLE_NAME = rs.getString("TABLE_NAME");
@@ -236,7 +246,7 @@ public class OracleCodeDao implements IJdbcDao {
 			logger.error("查询数据失败");
 			logger.error(e.toString(), e);
 		} finally {
-			closeStatement();
+			closeStatement(rs, st, pst);
 		}
 		return table;
 	}
@@ -244,6 +254,9 @@ public class OracleCodeDao implements IJdbcDao {
 	public List<PageData> showTableDatas(Page page) {
 		int rowCount = 0;
 		List<PageData> list = new ArrayList<PageData>();
+		ResultSet rs = null;
+		Statement st = null;
+		PreparedStatement pst = null;
 		try {
 			String tableName = page.getTable();
 			String sql = "select * from " + tableName;
@@ -256,7 +269,7 @@ public class OracleCodeDao implements IJdbcDao {
 			String pageSql = "select * from (select u.*, rownum r from (" + sql + ") u where rownum<"
 					+ (offset + page.getShowCount()) + ") where r>=" + offset;
 			st = (Statement) conn.createStatement();
-			ResultSet rs = st.executeQuery(pageSql);
+			rs = st.executeQuery(pageSql);
 			List<ColumnField> fields = showTableColumns(tableName);
 			while (rs.next()) {
 				PageData pd = new PageData();
@@ -274,25 +287,30 @@ public class OracleCodeDao implements IJdbcDao {
 			logger.error("查询数据失败");
 			logger.error(e.toString(), e);
 		} finally {
-			closeStatement();
+			closeStatement(rs, st, pst);
 		}
 		page.setDatas(list);
 		return list;
 	}
 
 	private int count(String sql) throws SQLException {
-		int rowCount = 0;
 		int count = 0;
-		String countSql = "select count(*) " + sql.substring(sql.indexOf("from"));
-		st = (Statement) conn.createStatement();
-		ResultSet rs = st.executeQuery(countSql);
-		while (rs.next()) {
-			count = rs.getInt(1);
-			rowCount++;
+		ResultSet rs = null;
+		Statement st = null;
+		try {
+			String countSql = "select count(*) " + sql.substring(sql.indexOf("from"));
+			st = (Statement) conn.createStatement();
+			rs = st.executeQuery(countSql);
+			while (rs.next()) {
+				count = rs.getInt(1);
+			}
+			logger.debug("==>  Preparing: " + sql);
+		} catch (SQLException e) {
+			logger.error("查询数据失败");
+			logger.error(e.toString(), e);
+		} finally {
+			closeStatement(rs, st, null);
 		}
-		// sql日志
-		logger.debug("==>  Preparing: " + sql);
-		logger.debug("<==      Total: " + rowCount);
 		return count;
 	}
 
@@ -300,9 +318,12 @@ public class OracleCodeDao implements IJdbcDao {
 	public List<PageData> showSqlDatas(String sql) {
 		int rowCount = 0;
 		List<PageData> list = new ArrayList<PageData>();
+		ResultSet rs = null;
+		Statement st = null;
+		PreparedStatement pst = null;
 		try {
 			st = (Statement) conn.createStatement();
-			ResultSet rs = st.executeQuery(sql);
+			rs = st.executeQuery(sql);
 
 			while (rs.next()) {
 				PageData pd = new PageData();
@@ -320,13 +341,16 @@ public class OracleCodeDao implements IJdbcDao {
 			logger.error("查询数据失败");
 			logger.error(e.toString(), e);
 		} finally {
-			closeStatement();
+			closeStatement(rs, st, pst);
 		}
 		return list;
 	}
 
 	@Override
 	public void insert(String tableName, PageData data) {
+		ResultSet rs = null;
+		Statement st = null;
+		PreparedStatement pst = null;
 		try {
 			// 拼接预编译sql
 			String sql = "insert into " + tableName + "(";
@@ -369,12 +393,15 @@ public class OracleCodeDao implements IJdbcDao {
 			logger.error("插入数据失败");
 			logger.error(e.toString(), e);
 		} finally {
-			closeStatement();
+			closeStatement(rs, st, pst);
 		}
 	}
 
 	@Override
 	public void update(String tableName, PageData data, PageData idPd) {
+		ResultSet rs = null;
+		Statement st = null;
+		PreparedStatement pst = null;
 		try {
 			// 拼接预编译sql
 			String sql = "update " + tableName + " set ";
@@ -420,7 +447,7 @@ public class OracleCodeDao implements IJdbcDao {
 			logger.error("更新数据失败");
 			logger.error(e.toString(), e);
 		} finally {
-			closeStatement();
+			closeStatement(rs, st, pst);
 		}
 	}
 

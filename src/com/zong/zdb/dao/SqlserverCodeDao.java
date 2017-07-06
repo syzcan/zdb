@@ -38,7 +38,7 @@ public class SqlserverCodeDao implements IJdbcDao {
 		}
 		if (rs != null) {
 			try {
-				st.close();
+				rs.close();
 			} catch (Exception e) {
 			}
 		}

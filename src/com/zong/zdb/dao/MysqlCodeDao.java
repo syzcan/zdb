@@ -39,7 +39,7 @@ public class MysqlCodeDao implements IJdbcDao {
 		}
 		if (rs != null) {
 			try {
-				st.close();
+				rs.close();
 			} catch (Exception e) {
 			}
 		}
