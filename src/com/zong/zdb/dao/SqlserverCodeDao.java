@@ -5,6 +5,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
@@ -201,7 +202,14 @@ public class SqlserverCodeDao implements IJdbcDao {
 			while (rs.next()) {
 				PageData pd = new PageData();
 				for (ColumnField columnField : fields) {
-					pd.put(columnField.getColumn(), rs.getString(columnField.getColumn()));
+					String value = "";
+					Object obj = rs.getObject(columnField.getColumn());
+					if (obj instanceof Timestamp) {
+						value = dateFormat.format(obj);
+					} else {
+						value = obj == null ? "" : obj.toString();
+					}
+					pd.put(columnField.getColumn(), value);
 				}
 				list.add(pd);
 				rowCount++;
@@ -254,7 +262,14 @@ public class SqlserverCodeDao implements IJdbcDao {
 			while (rs.next()) {
 				PageData pd = new PageData();
 				for (int i = 1; i <= rs.getMetaData().getColumnCount(); i++) {
-					pd.put(rs.getMetaData().getColumnName(i), rs.getString(i));
+					String value = "";
+					Object obj = rs.getObject(rs.getMetaData().getColumnName(i));
+					if (obj instanceof Timestamp) {
+						value = dateFormat.format(obj);
+					} else {
+						value = obj == null ? "" : obj.toString();
+					}
+					pd.put(rs.getMetaData().getColumnName(i), value);
 				}
 				list.add(pd);
 				rowCount++;
