@@ -1,13 +1,18 @@
 {
+	#配置各组件公共包名和所在包名
+	"packageName": "com.zong.web",
+	"packageJsp": "",
+	"tableName":"PRE_WSZY",
+	"className":"PreWszy",
+	"objectName":"Wszy",
 	#数据库连接配置
 	"dbs":[
 		{
-			"dbname": "dwr",
-			"jdbc.driverClassName": "com.mysql.jdbc.Driver",
-			"jdbc.url": "jdbc:mysql://localhost:3306/dwr",
-			"jdbc.username": "root",
-			"jdbc.password": "123456",
-			"jdbc.database": "dwr"
+			"dbname": "health242-gdadmin",
+			"jdbc.driverClassName": "oracle.jdbc.driver.OracleDriver",
+			"jdbc.url": "jdbc:oracle:thin:@10.1.125.242:1521:orcl",
+			"jdbc.username": "gdadmin",
+			"jdbc.password": "admin"
 		}
 	]
 }

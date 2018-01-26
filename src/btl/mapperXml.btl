@@ -1,0 +1,116 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="${packageMapper}.${className}Mapper" >
+  <resultMap id="BaseResultMap" type="${packageBean}.${className}" >
+    <% for(columnField in primaryColumns){%>	
+    <id column="${columnField.column}" property="${columnField.field}" jdbcType="${columnField.jdbcType}" />
+    <%}%>
+    <% for(columnField in normalColumns){%>
+    <result column="${columnField.column}" property="${columnField.field}" jdbcType="${columnField.jdbcType}" />
+    <%}%>
+  </resultMap>
+  <sql id="Base_Column_List" >
+  	<% for(columnField in primaryColumns){%>	
+    ${columnField.column},
+    <%}%>
+  	<% for(columnField in normalColumns){%>
+  	<%if(!columnFieldLP.last){%>
+    ${columnField.column},
+  	<%}%>
+  	<%if(columnFieldLP.last){%>
+    ${columnField.column}
+  	<%}%>
+    <%}%>
+  </sql>
+  
+  <!-- 根据对象主键查询 -->
+  <select id="load" resultMap="BaseResultMap" >
+    select 
+    <include refid="Base_Column_List" />
+    from ${tableName}
+    where
+  	<% for(columnField in primaryColumns){%>
+  	<%if(!columnFieldLP.last){%>
+    ${columnField.column} = #{${columnField.field},jdbcType=${columnField.jdbcType}} and
+    <%}%>
+  	<%if(columnFieldLP.last){%>
+    ${columnField.column} = #{${columnField.field},jdbcType=${columnField.jdbcType}} 
+    <%}%>
+    <%}%>
+  </select>
+  
+  <!-- 根据条件分页查询 -->
+  <select id="find${className}Page" resultMap="BaseResultMap" >
+    select * from ${tableName} where 1 = 1
+    <if test='pd.keyword != null and pd.keyword != ""'>
+    	<!-- and 字段 like concat(concat('%', #{pd.keyword}),'%') -->
+    </if>
+  </select>
+  
+  <!-- 根据条件查询全部 -->
+  <select id="find${className}" resultMap="BaseResultMap" >
+    select * from ${tableName} where 1 = 1
+    <if test='keyword != null and keyword != ""'>
+    </if>
+  </select>
+  
+  <!-- 根据对象主键删除 -->
+  <delete id="delete" >
+    delete from ${tableName}
+    where
+  	<% for(columnField in primaryColumns){%>
+  	<%if(!columnFieldLP.last){%>
+    ${columnField.column} = #{${columnField.field},jdbcType=${columnField.jdbcType}} and
+    <%}%>
+  	<%if(columnFieldLP.last){%>
+    ${columnField.column} = #{${columnField.field},jdbcType=${columnField.jdbcType}} 
+    <%}%>
+    <%}%>
+  </delete>
+  
+  <!-- 插入对象全部属性的字段 -->
+  <insert id="insert" parameterType="${packageBean}.${className}" >
+    insert into ${tableName} (<include refid="Base_Column_List" />)
+    values( 
+  		<% for(columnField in primaryColumns){%>
+    	#{${columnField.field},jdbcType=${columnField.jdbcType}},
+    	<%}%>
+  		<% for(columnField in normalColumns){%>
+  		<%if(!columnFieldLP.last){%>
+    	#{${columnField.field},jdbcType=${columnField.jdbcType}},
+    	<%}%>
+  		<%if(columnFieldLP.last){%>
+    	#{${columnField.field},jdbcType=${columnField.jdbcType}}
+    	<%}%>
+    	<%}%>
+  	)
+  </insert>
+  
+  <!-- 根据主键更新对象不为空属性的字段 -->
+  <update id="update" parameterType="${packageBean}.${className}" >
+    update ${tableName}
+    <set>
+    	<% for(columnField in normalColumns){%>
+    	<%if(!columnFieldLP.last){%>
+      	<if test="${columnField.field} != null" >
+        	${columnField.column} = #{${columnField.field},jdbcType=${columnField.jdbcType}},
+      	</if>
+      	<%}%>
+    	<%if(columnFieldLP.last){%>
+      	<if test="${columnField.field} != null" >
+        	${columnField.column} = #{${columnField.field},jdbcType=${columnField.jdbcType}}
+      	</if>
+      	<%}%>
+      	<%}%>
+    </set>
+    where
+  	<% for(columnField in primaryColumns){%>
+  	<%if(!columnFieldLP.last){%>
+    ${columnField.column} = #{${columnField.field},jdbcType=${columnField.jdbcType}} and
+    <%}%>
+  	<%if(columnFieldLP.last){%>
+    ${columnField.column} = #{${columnField.field},jdbcType=${columnField.jdbcType}} 
+    <%}%>
+    <%}%>
+  </update>
+</mapper>

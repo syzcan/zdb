@@ -1,0 +1,102 @@
+package ${packageService};
+
+import java.util.List;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import ${packageBean}.${className};
+import ${packageMapper}.${className}Mapper;
+import com.zong.util.Page;
+import com.zong.util.PageData;
+
+/**
+ * @desc ${objectName}业务实现类
+ * @author zong
+ * @date ${date(),"yyyy年MM月dd日"}
+ */
+@Service
+public class ${className}ServiceImpl implements ${className}Service {
+	@Autowired
+	private ${className}Mapper ${objectName}Mapper;
+
+	/**
+	 * 新增${objectName}
+	 * 
+	 * @param ${objectName}
+	 * @throws Exception
+	 */
+	@Transactional(rollbackFor = Exception.class)
+	public void add${className}(${className} ${objectName}) throws Exception {
+		<%if(primary.javaType=="String"){%>
+		//${objectName}.set${primary.fieldUpper}(UUID.randomUUID().toString().trim().replaceAll("-", ""));
+		<%}%>
+		${objectName}Mapper.insert(${objectName});
+	}
+	
+	/**
+	 * 删除${objectName}
+	 * 
+	 * @param ${objectName}
+	 */
+	@Transactional(rollbackFor = Exception.class)
+	public void delete${className}(${className} ${objectName}) throws Exception {
+		${objectName}Mapper.delete(${objectName});
+	}
+	
+	/**
+	 * 删除多个${objectName}
+	 * @param ids
+	 */
+	public void delete${className}s(String[] ids) throws Exception {
+		if(ids!=null && ids.length>0){
+			${className} ${objectName} = new ${className}();
+			for (String id : ids) {
+				${objectName}.set${primary.fieldUpper}(id);
+				${objectName}Mapper.delete(${objectName});
+			}
+		}
+	}
+
+	/**
+	 * 修改${objectName}
+	 * 
+	 * @param ${objectName}
+	 * @throws Exception
+	 */
+	@Transactional(rollbackFor = Exception.class)
+	public void edit${className}(${className} ${objectName}) throws Exception {
+		${objectName}Mapper.update(${objectName});
+	}
+
+	/**
+	 * 根据id查询${objectName}
+	 * 
+	 * @param ${objectName}
+	 * @return
+	 */
+	public ${className} load${className}(${className} ${objectName}) {
+		return ${objectName}Mapper.load(${objectName});
+	}
+
+	/**
+	 * 分页查询${objectName}
+	 * 
+	 * @param page
+	 * @return
+	 */
+	public List<${className}> find${className}Page(Page page) {
+		return ${objectName}Mapper.find${className}Page(page);
+	}
+	
+	/**
+	 * 查询全部${objectName}
+	 * 
+	 * @param pageData
+	 * @return
+	 */
+	public List<${className}> find${className}(PageData pageData) {
+		return ${objectName}Mapper.find${className}(pageData);
+	}
+}

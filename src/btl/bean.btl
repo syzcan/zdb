@@ -1,0 +1,49 @@
+package ${packageBean};
+
+${importPackage}
+import java.io.Serializable;
+import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonInclude.Include;
+
+/**
+ * @desc ${objectName}实体类
+ * @author zong
+ * @date ${date(),"yyyy年MM月dd日"}
+ */
+@JsonInclude(Include.NON_NULL)
+public class ${className} implements Serializable {
+<% for(columnField in primaryColumns){%>	
+	private ${columnField.javaType} ${columnField.field};
+<%}%>	
+<% for(columnField in normalColumns){%>
+	<%/*if(columnField.javaType=='Date'){%>
+	@JsonFormat(pattern="yyyy-MM-dd",timezone="GMT+8")
+	<%}*/%>
+	private ${columnField.javaType} ${columnField.field};
+<%}%>
+	
+	public ${className}(){
+	}
+	
+<% for(columnField in primaryColumns){%>	
+	public ${columnField.javaType} get${columnField.fieldUpper}(){
+		return ${columnField.field};
+	}
+	
+	public void set${columnField.fieldUpper}(${columnField.javaType} ${columnField.field}){
+		this.${columnField.field} = ${columnField.field};
+	}
+	
+<%}%>
+<% for(columnField in normalColumns){%>
+	public ${columnField.javaType} get${columnField.fieldUpper}(){
+		return ${columnField.field};
+	}
+	
+	public void set${columnField.fieldUpper}(${columnField.javaType} ${columnField.field}){
+		this.${columnField.field} = ${columnField.field};
+	}
+	
+<%}%>
+}

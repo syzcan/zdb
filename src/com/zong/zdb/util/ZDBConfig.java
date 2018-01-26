@@ -6,6 +6,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.log4j.Logger;
+
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.zong.zdb.bean.Table;
@@ -22,6 +24,8 @@ import com.zong.zdb.service.TemplateRoot;
  * @date 2016年11月27日 下午10:48:35
  */
 public class ZDBConfig {
+	private static final Logger logger = Logger.getLogger(MysqlCodeDao.class);
+	
 	public static final String DRIVER_ORACLE = "oracle.jdbc.driver.OracleDriver";
 	public static final String DRIVER_MYSQL = "com.mysql.jdbc.Driver";
 	public static final String DRIVER_MSSQL = "com.microsoft.sqlserver.jdbc.SQLServerDriver";
@@ -89,7 +93,7 @@ public class ZDBConfig {
 		try {
 			initDataConns(configData);
 		} catch (Exception e) {
-			e.printStackTrace();
+			logger.error(e.toString(), e);
 		}
 		return configData;
 	}
@@ -100,7 +104,7 @@ public class ZDBConfig {
 			try {
 				configData = readConfig();
 			} catch (Exception e) {
-				e.printStackTrace();
+				logger.error(e.toString(), e);
 				configData = new HashMap();
 			}
 		}
@@ -134,7 +138,7 @@ public class ZDBConfig {
 						dao = new SqlserverCodeDao(conn);
 					}
 				} catch (Exception e) {
-					e.printStackTrace();
+					logger.error(e.toString(), e);
 				}
 				data.put("dao", dao);
 			}
@@ -167,7 +171,7 @@ public class ZDBConfig {
 			objectMapper.configure(SerializationFeature.WRITE_NULL_MAP_VALUES, false);
 			System.out.println(objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(codeService.showSqlData("dwr", "select * from sys_user")));
 		} catch (Exception e) {
-			e.printStackTrace();
+			logger.error(e.toString(), e);
 		}
 	}
 }
