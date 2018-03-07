@@ -3,7 +3,6 @@ package com.zong.zdb.dao;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
-import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.sql.Timestamp;
@@ -72,8 +71,10 @@ public class OracleCodeDao implements IJdbcDao {
 			String cols = "COLUMN_NAME,DATA_TYPE,DATA_LENGTH,DATA_PRECISION,DATA_SCALE,DATA_DEFAULT,NULLABLE";
 			String sql = "select " + cols + " from sys.all_tab_columns where table_name='" + tableName
 					+ "' and lower(OWNER)=lower('" + username + "') order by column_id";
-//			String sql = "select " + cols + " from dba_tab_columns where table_name='" + tableName
-//					+ "' and lower(OWNER)=lower('" + username + "') order by column_id";
+			// String sql = "select " + cols + " from dba_tab_columns where
+			// table_name='" + tableName
+			// + "' and lower(OWNER)=lower('" + username + "') order by
+			// column_id";
 			rs = st.executeQuery(sql); // 执行sql查询语句，返回查询数据的结果集
 
 			while (rs.next()) {
@@ -101,8 +102,8 @@ public class OracleCodeDao implements IJdbcDao {
 			}
 			rs.close();
 			// sql日志
-			logger.debug("==>  Preparing: " + sql);
-			logger.debug("<==      Total: " + rowCount);
+			logger.debug("==>   Preparing: " + sql.replaceAll("\\s+", " ").replaceAll("\n", " "));;
+			logger.debug("<==       Total: " + rowCount);
 			rowCount = 0;
 			// 查询字段备注
 			sql = "select COLUMN_NAME,COMMENTS from user_col_comments where table_name='" + tableName + "'";
@@ -119,8 +120,8 @@ public class OracleCodeDao implements IJdbcDao {
 			}
 			rs.close();
 			// sql日志
-			logger.debug("==>  Preparing: " + sql);
-			logger.debug("<==      Total: " + rowCount);
+			logger.debug("==>   Preparing: " + sql.replaceAll("\\s+", " ").replaceAll("\n", " "));;
+			logger.debug("<==       Total: " + rowCount);
 			rowCount = 0;
 			// 查询表主键
 			sql = "select cu.COLUMN_NAME from user_cons_columns cu, user_constraints au where cu.constraint_name = au.constraint_name and au.constraint_type = 'P' and au.table_name = '"
@@ -136,8 +137,8 @@ public class OracleCodeDao implements IJdbcDao {
 				rowCount++;
 			}
 			// sql日志
-			logger.debug("==>  Preparing: " + sql);
-			logger.debug("<==      Total: " + rowCount);
+			logger.debug("==>   Preparing: " + sql.replaceAll("\\s+", " ").replaceAll("\n", " "));;
+			logger.debug("<==       Total: " + rowCount);
 			// conn.close(); // 关闭数据库连接
 		} catch (SQLException e) {
 			logger.error("查询数据失败");
@@ -174,8 +175,8 @@ public class OracleCodeDao implements IJdbcDao {
 			}
 			rs.close();
 			// sql日志
-			logger.debug("==>  Preparing: " + sql);
-			logger.debug("<==      Total: " + rowCount);
+			logger.debug("==>   Preparing: " + sql.replaceAll("\\s+", " ").replaceAll("\n", " "));;
+			logger.debug("<==       Total: " + rowCount);
 			rowCount = 0;
 			sql = "select TABLE_NAME,NUM_ROWS from user_tables order by num_rows desc";
 			rs = st.executeQuery(sql);
@@ -190,8 +191,8 @@ public class OracleCodeDao implements IJdbcDao {
 				rowCount++;
 			}
 			// sql日志
-			logger.debug("==>  Preparing: " + sql);
-			logger.debug("<==      Total: " + rowCount);
+			logger.debug("==>   Preparing: " + sql.replaceAll("\\s+", " ").replaceAll("\n", " "));;
+			logger.debug("<==       Total: " + rowCount);
 			// conn.close(); // 关闭数据库连接
 		} catch (SQLException e) {
 			logger.error("查询数据失败");
@@ -225,8 +226,8 @@ public class OracleCodeDao implements IJdbcDao {
 			}
 			rs.close();
 			// sql日志
-			logger.debug("==>  Preparing: " + sql);
-			logger.debug("<==      Total: " + rowCount);
+			logger.debug("==>   Preparing: " + sql.replaceAll("\\s+", " ").replaceAll("\n", " "));;
+			logger.debug("<==       Total: " + rowCount);
 			rowCount = 0;
 			sql = "select TABLE_NAME,NUM_ROWS from user_tables where table_name = '" + tableName
 					+ "' order by NUM_ROWS desc";
@@ -240,8 +241,8 @@ public class OracleCodeDao implements IJdbcDao {
 				rowCount++;
 			}
 			// sql日志
-			logger.debug("==>  Preparing: " + sql);
-			logger.debug("<==      Total: " + rowCount);
+			logger.debug("==>   Preparing: " + sql.replaceAll("\\s+", " ").replaceAll("\n", " "));;
+			logger.debug("<==       Total: " + rowCount);
 			// conn.close();
 		} catch (SQLException e) {
 			logger.error("查询数据失败");
@@ -288,8 +289,8 @@ public class OracleCodeDao implements IJdbcDao {
 				rowCount++;
 			}
 			// sql日志
-			logger.debug("==>  Preparing: " + sql);
-			logger.debug("<==      Total: " + rowCount);
+			logger.debug("==>   Preparing: " + sql.replaceAll("\\s+", " ").replaceAll("\n", " "));;
+			logger.debug("<==       Total: " + rowCount);
 			// conn.close(); // 关闭数据库连接
 		} catch (SQLException e) {
 			logger.error("查询数据失败");
@@ -312,7 +313,7 @@ public class OracleCodeDao implements IJdbcDao {
 			while (rs.next()) {
 				count = rs.getInt(1);
 			}
-			logger.debug("==>  Preparing: " + sql);
+			logger.debug("==>   Preparing: " + sql.replaceAll("\\s+", " ").replaceAll("\n", " "));;
 		} catch (SQLException e) {
 			logger.error("查询数据失败");
 			logger.error(e.toString(), e);
@@ -349,8 +350,49 @@ public class OracleCodeDao implements IJdbcDao {
 				rowCount++;
 			}
 			// sql日志
-			logger.debug("==>  Preparing: " + sql);
-			logger.debug("<==      Total: " + rowCount);
+			logger.debug("==>   Preparing: " + sql.replaceAll("\\s+", " ").replaceAll("\n", " "));;
+			logger.debug("<==       Total: " + rowCount);
+		} catch (SQLException e) {
+			logger.error("查询数据失败");
+			logger.error(e.toString(), e);
+		} finally {
+			closeStatement(rs, st, pst);
+		}
+		return list;
+	}
+
+	@Override
+	public List<PageData> showSqlDatas(String sql, List<String> params) {
+		List<PageData> list = new ArrayList<PageData>();
+		int rowCount = 0;
+		ResultSet rs = null;
+		Statement st = null;
+		PreparedStatement pst = null;
+		try {
+			pst = conn.prepareStatement(sql);
+			for (int i = 0; i < params.size(); i++) {
+				pst.setString(i + 1, params.get(i));
+			}
+			rs = pst.executeQuery();
+			while (rs.next()) {
+				PageData pd = new PageData();
+				for (int i = 1; i <= rs.getMetaData().getColumnCount(); i++) {
+					String value = "";
+					Object obj = rs.getObject(rs.getMetaData().getColumnName(i));
+					if (obj instanceof Timestamp) {
+						value = dateFormat.format(obj);
+					} else {
+						value = obj == null ? "" : obj.toString();
+					}
+					pd.put(rs.getMetaData().getColumnName(i), value);
+				}
+				list.add(pd);
+				rowCount++;
+			}
+			// sql日志
+			logger.debug("==>   Preparing: " + sql.replaceAll("\\s+", " ").replaceAll("\n", " "));;
+			logger.debug("==>      params: " + params);
+			logger.debug("<==       Total: " + rowCount);
 		} catch (SQLException e) {
 			logger.error("查询数据失败");
 			logger.error(e.toString(), e);
@@ -400,8 +442,8 @@ public class OracleCodeDao implements IJdbcDao {
 			}
 			int rowCount = pst.executeUpdate();
 			// sql日志
-			logger.debug("==>   Preparing: " + sql);
-			logger.debug("==>  Parameters: " + params.toString().replaceAll(",$", ""));
+			logger.debug("==>   Preparing: " + sql.replaceAll("\\s+", " ").replaceAll("\n", " "));;
+			logger.debug("==>      params: " + params.toString().replaceAll(",$", ""));
 			logger.debug("<==       Total: " + rowCount);
 		} catch (SQLException e) {
 			logger.error("插入数据失败");
@@ -454,8 +496,8 @@ public class OracleCodeDao implements IJdbcDao {
 			}
 			int rowCount = pst.executeUpdate();
 			// sql日志
-			logger.debug("==>   Preparing: " + sql);
-			logger.debug("==>  Parameters: " + params.toString().replaceAll(",$", ""));
+			logger.debug("==>   Preparing: " + sql.replaceAll("\\s+", " ").replaceAll("\n", " "));;
+			logger.debug("==>      params: " + params.toString().replaceAll(",$", ""));
 			logger.debug("<==       Total: " + rowCount);
 		} catch (SQLException e) {
 			logger.error("更新数据失败");

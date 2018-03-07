@@ -72,7 +72,7 @@ public class MysqlCodeDao implements IJdbcDao {
 				// 根据字段名获取相应的值
 				String column = rs.getString("COLUMN_NAME");
 				String comment = rs.getString("COLUMN_COMMENT");
-				String columnType = rs.getString("COLUMN_TYPE");//mysql才有这个
+				String columnType = rs.getString("COLUMN_TYPE");// mysql才有这个
 				String dataType = rs.getString("DATA_TYPE");
 				String columnKey = rs.getString("COLUMN_KEY");
 				String canNull = rs.getString("IS_NULLABLE");
@@ -98,8 +98,8 @@ public class MysqlCodeDao implements IJdbcDao {
 				rowCount++;
 			}
 			// sql日志
-			logger.debug("==>  Preparing: " + sql);
-			logger.debug("<==      Total: " + rowCount);
+			logger.debug("==>   Preparing: " + sql.replaceAll("\\s+", " ").replaceAll("\n", " "));;
+			logger.debug("<==       Total: " + rowCount);
 			// conn.close(); // 关闭数据库连接
 		} catch (SQLException e) {
 			logger.error("查询数据失败");
@@ -138,8 +138,8 @@ public class MysqlCodeDao implements IJdbcDao {
 				rowCount++;
 			}
 			// sql日志
-			logger.debug("==>  Preparing: " + sql);
-			logger.debug("<==      Total: " + rowCount);
+			logger.debug("==>   Preparing: " + sql.replaceAll("\\s+", " ").replaceAll("\n", " "));;
+			logger.debug("<==       Total: " + rowCount);
 			// conn.close(); // 关闭数据库连接
 		} catch (SQLException e) {
 			logger.error("查询数据失败");
@@ -185,8 +185,8 @@ public class MysqlCodeDao implements IJdbcDao {
 				rowCount++;
 			}
 			// sql日志
-			logger.debug("==>  Preparing: " + sql);
-			logger.debug("<==      Total: " + rowCount);
+			logger.debug("==>   Preparing: " + sql.replaceAll("\\s+", " ").replaceAll("\n", " "));;
+			logger.debug("<==       Total: " + rowCount);
 			// conn.close(); // 关闭数据库连接
 		} catch (SQLException e) {
 			logger.error("查询数据失败");
@@ -232,8 +232,8 @@ public class MysqlCodeDao implements IJdbcDao {
 				rowCount++;
 			}
 			// sql日志
-			logger.debug("==>  Preparing: " + sql);
-			logger.debug("<==      Total: " + rowCount);
+			logger.debug("==>   Preparing: " + sql.replaceAll("\\s+", " ").replaceAll("\n", " "));;
+			logger.debug("<==       Total: " + rowCount);
 			// conn.close(); // 关闭数据库连接
 		} catch (SQLException e) {
 			logger.error("查询数据失败");
@@ -292,8 +292,49 @@ public class MysqlCodeDao implements IJdbcDao {
 				rowCount++;
 			}
 			// sql日志
-			logger.debug("==>  Preparing: " + sql);
-			logger.debug("<==      Total: " + rowCount);
+			logger.debug("==>   Preparing: " + sql.replaceAll("\\s+", " ").replaceAll("\n", " "));;
+			logger.debug("<==       Total: " + rowCount);
+		} catch (SQLException e) {
+			logger.error("查询数据失败");
+			logger.error(e.toString(), e);
+		} finally {
+			closeStatement(rs, st, pst);
+		}
+		return list;
+	}
+
+	@Override
+	public List<PageData> showSqlDatas(String sql, List<String> params) {
+		List<PageData> list = new ArrayList<PageData>();
+		int rowCount = 0;
+		ResultSet rs = null;
+		Statement st = null;
+		PreparedStatement pst = null;
+		try {
+			pst = conn.prepareStatement(sql);
+			for (int i = 0; i < params.size(); i++) {
+				pst.setString(i + 1, params.get(i));
+			}
+			rs = pst.executeQuery();
+			while (rs.next()) {
+				PageData pd = new PageData();
+				for (int i = 1; i <= rs.getMetaData().getColumnCount(); i++) {
+					String value = "";
+					Object obj = rs.getObject(rs.getMetaData().getColumnName(i));
+					if (obj instanceof Timestamp) {
+						value = dateFormat.format(obj);
+					} else {
+						value = obj == null ? "" : obj.toString();
+					}
+					pd.put(rs.getMetaData().getColumnName(i), value);
+				}
+				list.add(pd);
+				rowCount++;
+			}
+			// sql日志
+			logger.debug("==>   Preparing: " + sql.replaceAll("\\s+", " ").replaceAll("\n", " "));;
+			logger.debug("==>      params: " + params);
+			logger.debug("<==       Total: " + rowCount);
 		} catch (SQLException e) {
 			logger.error("查询数据失败");
 			logger.error(e.toString(), e);
@@ -343,8 +384,8 @@ public class MysqlCodeDao implements IJdbcDao {
 			}
 			int rowCount = pst.executeUpdate();
 			// sql日志
-			logger.debug("==>   Preparing: " + sql);
-			logger.debug("==>  Parameters: " + params.toString().replaceAll(",$", ""));
+			logger.debug("==>   Preparing: " + sql.replaceAll("\\s+", " ").replaceAll("\n", " "));;
+			logger.debug("==>      params: " + params.toString().replaceAll(",$", ""));
 			logger.debug("<==       Total: " + rowCount);
 		} catch (SQLException e) {
 			logger.error("插入数据失败");
@@ -397,8 +438,8 @@ public class MysqlCodeDao implements IJdbcDao {
 			}
 			int rowCount = pst.executeUpdate();
 			// sql日志
-			logger.debug("==>   Preparing: " + sql);
-			logger.debug("==>  Parameters: " + params.toString().replaceAll(",$", ""));
+			logger.debug("==>   Preparing: " + sql.replaceAll("\\s+", " ").replaceAll("\n", " "));
+			logger.debug("==>      params: " + params.toString().replaceAll(",$", ""));
 			logger.debug("<==       Total: " + rowCount);
 		} catch (SQLException e) {
 			logger.error("更新数据失败");
@@ -431,7 +472,7 @@ public class MysqlCodeDao implements IJdbcDao {
 			st = (Statement) conn.createStatement();
 			st.executeUpdate(sql);
 			// sql日志
-			logger.debug("==>   Preparing: " + sql);
+			logger.debug("==>   Preparing: " + sql.replaceAll("\\s+", " ").replaceAll("\n", " "));;
 			return true;
 		} catch (SQLException e) {
 			logger.error("创建表失败");
@@ -458,7 +499,7 @@ public class MysqlCodeDao implements IJdbcDao {
 			if (comment != null && !comment.equals(table.getComment())) {
 				String sql = "alter table " + tableName + " comment '" + comment + "'";
 				st.executeUpdate(sql);
-				logger.debug("==>   Preparing: " + sql);
+				logger.debug("==>   Preparing: " + sql.replaceAll("\\s+", " ").replaceAll("\n", " "));;
 			}
 			List<ColumnField> columnFields = table.getColumnFields();
 			List<PageData> columns = (List<PageData>) tableData.get("columns");
@@ -474,7 +515,7 @@ public class MysqlCodeDao implements IJdbcDao {
 							String sql = "alter table " + tableName + " modify column " + column + " " + type
 									+ " comment '" + remark + "'";
 							st.executeUpdate(sql);
-							logger.debug("==>   Preparing: " + sql);
+							logger.debug("==>   Preparing: " + sql.replaceAll("\\s+", " ").replaceAll("\n", " "));;
 						}
 						// 已经存在
 						flag = false;
@@ -485,7 +526,7 @@ public class MysqlCodeDao implements IJdbcDao {
 					String sql = "alter table " + tableName + " add column " + column + " " + type + " comment '"
 							+ (remark == null ? "" : remark) + "'";
 					st.executeUpdate(sql);
-					logger.debug("==>   Preparing: " + sql);
+					logger.debug("==>   Preparing: " + sql.replaceAll("\\s+", " ").replaceAll("\n", " "));;
 				}
 			}
 			// DDL不支持事务回滚

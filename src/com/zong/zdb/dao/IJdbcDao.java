@@ -38,6 +38,15 @@ public interface IJdbcDao {
 	 * @param sql
 	 */
 	public List<PageData> showSqlDatas(String sql);
+	
+	/**
+	 * 预编译方式查询
+	 * 
+	 * @param sql 含占位符?的sql语句
+	 * @param params 按顺序对应占位符的参数值，全部认为是String
+	 * @return
+	 */
+	public List<PageData> showSqlDatas(String sql, List<String> params);
 
 	/**
 	 * 插入数据
