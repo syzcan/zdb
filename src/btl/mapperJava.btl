@@ -3,8 +3,8 @@ package ${packageMapper};
 import java.util.List;
 
 import ${packageBean}.${className};
-import com.zong.util.Page;
-import com.zong.util.PageData;
+import com.zong.core.bean.Page;
+import com.zong.core.bean.PageData;
 
 public interface ${className}Mapper {
 
@@ -25,10 +25,10 @@ public interface ${className}Mapper {
 	/**
 	 * 根据条件查询全部
 	 * 
-	 * @param pageData
+	 * @param pd
 	 * @return
 	 */
-	List<${className}> find${className}(PageData pageData);
+	List<${className}> find${className}(PageData pd);
 	
 	/**
 	 * 根据对象主键删除

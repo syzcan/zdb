@@ -115,7 +115,7 @@ public class ZDBConfig {
 	 * 初始化数据库连接池
 	 */
 	@SuppressWarnings({ "unchecked", "rawtypes" })
-	private static void initDataConns(Map configData) {
+	public static void initDataConns(Map configData) {
 		List<Map> dbDatas = (List<Map>) configData.get(DBS);
 		if (dbDatas != null) {
 			for (Map data : dbDatas) {
@@ -157,6 +157,13 @@ public class ZDBConfig {
 			}
 		}
 		return null;
+	}
+	
+	/**
+	 * 重新连接，超时无法链接时重连
+	 */
+	public static void reconnect(){
+		initDataConns(configData);
 	}
 
 	public static void main(String[] args) {

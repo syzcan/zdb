@@ -17,9 +17,9 @@ public class ${className} implements Serializable {
 	private ${columnField.javaType} ${columnField.field};
 <%}%>	
 <% for(columnField in normalColumns){%>
-	<%/*if(columnField.javaType=='Date'){%>
+	<%if(columnField.javaType=='Date'){%>
 	@JsonFormat(pattern="yyyy-MM-dd",timezone="GMT+8")
-	<%}*/%>
+	<%}%>
 	private ${columnField.javaType} ${columnField.field};
 <%}%>
 	

@@ -61,6 +61,7 @@ public class TemplateRoot extends HashMap implements Map, Serializable {
 		root.put("normalColumns", table.getNormalColumns());
 		root.put("primaryColumns", table.getPrimaryColumns());
 		root.put("primary", table.getPrimary());
+		root.put("packageName", packageName);
 		root.put("objectName", objectName);
 		root.put("className", className);
 		root.put("importPackage", getImportPackage(table));

@@ -1,4 +1,4 @@
-package ${packageService};
+package ${packageService}.impl;
 
 import java.util.List;
 
@@ -8,8 +8,8 @@ import org.springframework.transaction.annotation.Transactional;
 
 import ${packageBean}.${className};
 import ${packageMapper}.${className}Mapper;
-import com.zong.util.Page;
-import com.zong.util.PageData;
+import com.zong.core.bean.Page;
+import com.zong.core.bean.PageData;
 
 /**
  * @desc ${objectName}业务实现类
@@ -46,20 +46,6 @@ public class ${className}ServiceImpl implements ${className}Service {
 	}
 	
 	/**
-	 * 删除多个${objectName}
-	 * @param ids
-	 */
-	public void delete${className}s(String[] ids) throws Exception {
-		if(ids!=null && ids.length>0){
-			${className} ${objectName} = new ${className}();
-			for (String id : ids) {
-				${objectName}.set${primary.fieldUpper}(id);
-				${objectName}Mapper.delete(${objectName});
-			}
-		}
-	}
-
-	/**
 	 * 修改${objectName}
 	 * 
 	 * @param ${objectName}
@@ -93,10 +79,10 @@ public class ${className}ServiceImpl implements ${className}Service {
 	/**
 	 * 查询全部${objectName}
 	 * 
-	 * @param pageData
+	 * @param pd
 	 * @return
 	 */
-	public List<${className}> find${className}(PageData pageData) {
-		return ${objectName}Mapper.find${className}(pageData);
+	public List<${className}> find${className}(PageData pd) {
+		return ${objectName}Mapper.find${className}(pd);
 	}
 }

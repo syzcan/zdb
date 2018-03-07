@@ -14,12 +14,7 @@
     ${columnField.column},
     <%}%>
   	<% for(columnField in normalColumns){%>
-  	<%if(!columnFieldLP.last){%>
-    ${columnField.column},
-  	<%}%>
-  	<%if(columnFieldLP.last){%>
-    ${columnField.column}
-  	<%}%>
+    ${columnField.column}${!columnFieldLP.last?',':''}
     <%}%>
   </sql>
   
@@ -30,12 +25,7 @@
     from ${tableName}
     where
   	<% for(columnField in primaryColumns){%>
-  	<%if(!columnFieldLP.last){%>
-    ${columnField.column} = #{${columnField.field},jdbcType=${columnField.jdbcType}} and
-    <%}%>
-  	<%if(columnFieldLP.last){%>
-    ${columnField.column} = #{${columnField.field},jdbcType=${columnField.jdbcType}} 
-    <%}%>
+    ${columnField.column} = #{${columnField.field},jdbcType=${columnField.jdbcType}} ${!columnFieldLP.last?'and':''}
     <%}%>
   </select>
   
@@ -59,12 +49,7 @@
     delete from ${tableName}
     where
   	<% for(columnField in primaryColumns){%>
-  	<%if(!columnFieldLP.last){%>
-    ${columnField.column} = #{${columnField.field},jdbcType=${columnField.jdbcType}} and
-    <%}%>
-  	<%if(columnFieldLP.last){%>
-    ${columnField.column} = #{${columnField.field},jdbcType=${columnField.jdbcType}} 
-    <%}%>
+    ${columnField.column} = #{${columnField.field},jdbcType=${columnField.jdbcType}} ${!columnFieldLP.last?'and':''}
     <%}%>
   </delete>
   
@@ -76,12 +61,7 @@
     	#{${columnField.field},jdbcType=${columnField.jdbcType}},
     	<%}%>
   		<% for(columnField in normalColumns){%>
-  		<%if(!columnFieldLP.last){%>
-    	#{${columnField.field},jdbcType=${columnField.jdbcType}},
-    	<%}%>
-  		<%if(columnFieldLP.last){%>
-    	#{${columnField.field},jdbcType=${columnField.jdbcType}}
-    	<%}%>
+    	#{${columnField.field},jdbcType=${columnField.jdbcType}}${!columnFieldLP.last?',':''}
     	<%}%>
   	)
   </insert>
@@ -91,26 +71,14 @@
     update ${tableName}
     <set>
     	<% for(columnField in normalColumns){%>
-    	<%if(!columnFieldLP.last){%>
       	<if test="${columnField.field} != null" >
         	${columnField.column} = #{${columnField.field},jdbcType=${columnField.jdbcType}},
       	</if>
       	<%}%>
-    	<%if(columnFieldLP.last){%>
-      	<if test="${columnField.field} != null" >
-        	${columnField.column} = #{${columnField.field},jdbcType=${columnField.jdbcType}}
-      	</if>
-      	<%}%>
-      	<%}%>
     </set>
     where
   	<% for(columnField in primaryColumns){%>
-  	<%if(!columnFieldLP.last){%>
-    ${columnField.column} = #{${columnField.field},jdbcType=${columnField.jdbcType}} and
-    <%}%>
-  	<%if(columnFieldLP.last){%>
-    ${columnField.column} = #{${columnField.field},jdbcType=${columnField.jdbcType}} 
-    <%}%>
+    ${columnField.column} = #{${columnField.field},jdbcType=${columnField.jdbcType}} ${!columnFieldLP.last?'and':''}
     <%}%>
   </update>
 </mapper>

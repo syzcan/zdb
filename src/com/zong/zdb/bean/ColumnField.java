@@ -179,6 +179,14 @@ public class ColumnField {
 	 * 获取首字母大写的属性名
 	 */
 	public String getFieldUpper() {
+		//return getField().substring(0, 1).toUpperCase() + getField().substring(1);
+		// 当属性第二个字母为大写时，get方法第一个字母为小写
+		if(getField().length() > 1){
+			String second = getField().substring(1, 2);
+			if(second.equals(second.toUpperCase())){
+				return getField();
+			}
+		}
 		return getField().substring(0, 1).toUpperCase() + getField().substring(1);
 	}
 

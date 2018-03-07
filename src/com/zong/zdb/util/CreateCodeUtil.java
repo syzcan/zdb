@@ -19,16 +19,16 @@ public class CreateCodeUtil {
 	private final static Logger LOGGER = Logger.getLogger(CreateCodeUtil.class);
 
 	public static String downCode(Table table, String objectName, String className, String packageName,
-			String parentPath) {
-		String result = "";
+			String parentPath, String btlPath) {
+		String codePath = "";
 		try {
 			TemplateRoot root = TemplateRoot.createTemplateRoot(table, objectName, className, packageName);
 			// String parentPath = FileUtils.getClassResources();//
 			// code文件夹父文件夹路径
 			// String parentPath =
 			// request.getServletContext().getRealPath("/static");
-			String codePath = parentPath + "/code";// 生成代码存放路径
-			String btlPath = FileUtils.getClassResources() + "btl/";
+			codePath = parentPath + "/code";// 生成代码存放路径
+			// String btlPath = FileUtils.getClassResources() + "btl/";
 			// 先删除原来的
 			FileUtils.removeAllFile(codePath);
 
@@ -84,7 +84,7 @@ public class CreateCodeUtil {
 		} catch (Exception e) {
 			LOGGER.error(e.toString(), e);
 		}
-		return result;
+		return codePath;
 	}
 
 	public static void main(String[] args) {
@@ -99,8 +99,9 @@ public class CreateCodeUtil {
 					configData.get("tableName").toString());
 			LOGGER.info("生成文件start");
 			// 生成代码
+			String btlPath = FileUtils.getClassResources() + "btl/";
 			downCode(table, configData.get("objectName").toString(), configData.get("className").toString(),
-					configData.get("packageName").toString(), FileUtils.getClassResources());
+					configData.get("packageName").toString(), FileUtils.getClassResources(), btlPath);
 			LOGGER.info("生成文件end");
 		} catch (Exception e) {
 			LOGGER.error(e.toString(), e);

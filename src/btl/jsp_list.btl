@@ -1,68 +1,71 @@
 \<%@ page language="java" contentType="text/html; charset=utf-8" pageEncoding="utf-8"%>
-\<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
-\<%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt"%>
 <!DOCTYPE html>
 <html lang="zh-cn">
 <head>
 <title>月光边境</title>
-<meta name="keywords" content="关键词" />
-<meta name="description" content="描述" />
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-\<%@ include file="/WEB-INF/jsp/common/style.jsp"%>
-</head>
+\<%@ include file="/WEB-INF/jsp/common/style_easyui.jsp"%>
 <body>
-	<div class="margin">
-		<div class="panel">
-			<div class="panel-head">
-				<form action="\${ctx}/${objectName}/list">
-					<input type="button" class="button border-green" value="新增" onclick="openView('新增','\${ctx}/${objectName}/toAdd')" />
-					<input type="button" class="button border-red" value="删除" onclick="deleteForm('dataForm',this)" action="\${ctx}/${objectName}/deleteAll" />
-					<input name="keyword" value="\${page.pd.keyword }" type="text" style="margin-left: 50px" class="input input-auto border-main" placeholder="输入关键字"> 
-					<input type="submit" value="搜索" class="button  bg-main" style="border-left: 0 none;margin-left: -10px;border-top-left-radius:0;border-bottom-left-radius:0" />
-			</div>
-			<form id="dataForm" method="post">
-				<table class="table table-hover">
-					<thead>
-						<tr>
-							<th><input type="checkbox" class="checkall" name="checkall" checkfor="id" /></th>
-							<% for(columnField in normalColumns){%>
-							<%if(has(columnField.remark) && columnField.remark!=""){%>
-							<th>${columnField.remark}</th>
-							<%}else{%>
-							<th>${columnField.field}</th>
-							<%}%>
-							<%}%>
-							<th>操作</th>
-						</tr>
-					</thead>
-					<c:forEach items="\${${objectName}s }" var="${objectName}">
-						<tr>
-							<td>
-								<input type="checkbox" name="id" value="\${${objectName}.${primary.field} }" />
-							</td>
-							<% for(columnField in normalColumns){%>
-							<%if(columnField.jdbcType=="TIMESTAMP"){%>
-							<td><fmt:formatDate value="\${${objectName}.${columnField.field} }" pattern="yyyy-MM-dd"/></td>
-							<%}else{%>
-							<td>\${${objectName}.${columnField.field} }</td>
-							<%}%>
-							<%}%>
-							<td>
-								<a class="button border-green button-little" href="javascript:;" onclick="openDiv('<strong>\${${objectName}.${primary.field} }</strong>','\${ctx}/${objectName}/view?${primary.field}=\${${objectName}.${primary.field} }','760px','600px')">查看</a>
-								<a class="button border-blue button-little" href="javascript:;" onclick="openView('修改','\${ctx}/${objectName}/toEdit?${primary.field}=\${${objectName}.${primary.field} }')">修改</a> 
-								<a class="button border-yellow button-little" href="javascript:;" onclick="ajaxDeleteData('\${ctx}/${objectName}/delete?${primary.field}=\${${objectName}.${primary.field} }')">删除</a>
-							</td>
-						</tr>
-					</c:forEach>
-				</table>
-			</form>
-			<div class="panel-foot text-center">
-				<form action="\${ctx}/${objectName}/list">
-					\<%@ include file="/WEB-INF/jsp/common/pagination.jsp"%>
-				</form>
-			</div>
-		</div>
+<!-- 工具栏 -->
+<div id="toolbar" class="easyui-toolbar">
+	<div style="float: left;">
+	    <a class="easyui-linkbutton btn-green" data-options="iconCls:'fa fa-plus'" id="add">新增</a>
+	    <a class="easyui-linkbutton btn-blue" data-options="iconCls:'fa fa-edit'" id="edit">编辑</a>
+	    <a class="easyui-linkbutton btn-red" data-options="iconCls:'fa fa-remove'" id="del">删除</a>
+    </div>
+    <form style="float: left;margin-left: 20px">
+        <input type="text" name="keyword" class="easyui-textbox" data-options="prompt:'关键字',width:120">
+        <a class="easyui-linkbutton btn-cyan" data-options="iconCls:'fa fa-search'" id="search">查询</a>
+    </form>
+    <div style="clear: both;"></div>
+</div>
+<!-- 数据网格 -->
+<table id="dg" data-options="toolbar:'#toolbar'"></table>
+<!-- 表单弹出层 -->
+<div style="display: none">
+	<div id="dialog" data-options="buttons:'#btns'"></div>
+	<div id="btns">
+		<a class="easyui-linkbutton btn-green" data-options="iconCls:'fa fa-save'" onclick="$('#form').submit()">保存</a>
+    	<a class="easyui-linkbutton btn-red" data-options="iconCls:'fa fa-close'" onclick="$('#dialog').dialog('close')">关闭</a>
 	</div>
+</div>
+<script>
+    	// 数据列表
+        $("#dg").zdatagrid({
+            url: '\${ctx}/${packageJsp==''?'':packageJsp+'/'}${objectName}/datas.json',
+            columns: [[
+                {field: '${primary.field}', title: '主键', hidden: true},
+                <% for(columnField in normalColumns){%>
+                {field: '${columnField.field}', title: '<%if(!isEmpty(columnField.remark) && columnField.remark!=""){%>${columnField.remark}<%}else{%>${columnField.field}<%}%>'}${!columnFieldLP.last?',':''}
+                <%}%>
+            ]]
+        });
+		// 新增数据
+		$('#add').zbutton({
+			operate: 'add',
+			title: '新增', 
+			href: '\${ctx}/${packageJsp==''?'':packageJsp+'/'}${objectName}/toAdd', 
+			posturl: '\${ctx}/${packageJsp==''?'':packageJsp+'/'}${objectName}/add.json'
+		});
+		// 编辑选中数据
+		$('#edit').zbutton({
+			operate: 'edit',
+			title: '编辑', 
+			href: '\${ctx}/${packageJsp==''?'':packageJsp+'/'}${objectName}/toEdit', 
+			posturl: '\${ctx}/${packageJsp==''?'':packageJsp+'/'}${objectName}/edit.json', 
+			dataurl: '\${ctx}/${packageJsp==''?'':packageJsp+'/'}${objectName}/data.json',
+			pk: '${primary.field}'
+		});
+		// 删除选中数据
+		$('#del').zbutton({
+			operate: 'del',
+			posturl: '\${ctx}/${packageJsp==''?'':packageJsp+'/'}${objectName}/delete.json',
+			pk: '${primary.field}'
+		});
+		// 查询数据
+		$('#search').zbutton({
+			operate: 'search'
+		});
+</script>
 </body>
 </html>
