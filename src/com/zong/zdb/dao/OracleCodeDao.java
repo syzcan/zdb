@@ -159,7 +159,7 @@ public class OracleCodeDao implements IJdbcDao {
 		Statement st = null;
 		PreparedStatement pst = null;
 		try {
-			String sql = "select * from user_tab_comments order by table_name";
+			String sql = "select * from user_tab_comments where table_type='TABLE' order by table_name";
 			st = (Statement) conn.createStatement();
 			rs = st.executeQuery(sql);
 
