@@ -1,3 +1,6 @@
+2018-03-29
+1、修改build.xml，实现单独jar打包和代码生成器zcoder集成打包
+
 2018-03-07
 1、增加预编译查询方法showSqlDatas(sql, params)
 2、调整sql日志输出格式

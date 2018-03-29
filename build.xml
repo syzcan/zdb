@@ -1,8 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project name="zdb" default="jar" basedir=".">
+<project name="zdb" default="zcoder" basedir=".">
 	<property name="src.dir" value="src" />
 	<property name="lib.dir" value="lib" />
 	<property name="classes.dir" value="classes" />
+	<property name="version" value="3.0" />
 	<!--第三方jar-->
 	<path id="classpath">
 		<fileset dir="${lib.dir}">
@@ -16,15 +17,65 @@
 	</target>
 	<!-- 2. 编译 -->
 	<target name="compile" depends="init">
-		<javac srcdir="${src.dir}" destdir="${classes.dir}">
+		<javac target="1.7" source="1.7" srcdir="${src.dir}" destdir="${classes.dir}">
 			<compilerarg line="-encoding UTF-8" />
 			<classpath refid="classpath" />
 		</javac>
+		<copy file="${src.dir}/log4j.properties" todir="${classes.dir}" overwrite="true" />
 	</target>
 	<!-- 3. 打包jar文件 -->
 	<target name="jar" depends="compile">
+		<pathconvert property="lib" pathsep=" ">
+			<!--mapper,对路径组合方式进行控制-->
+			<mapper>
+				<!--chainedmapper 作用是联合多个mapper-->
+				<chainedmapper>
+					<!--过滤文件，将路径去掉，只保留文件名-->
+					<flattenmapper />
+					<!--过滤+转换器，将所有的文件名前面都加上一个lib，我们知道lib目录下面有jar包，  
+		                    lib/*的作用其实是将jar包名与路径进行组合形成如：lib/google.jar这样的相对路径  
+		                 -->
+					<globmapper from="*" to="lib/*" />
+				</chainedmapper>
+			</mapper>
+			<!--按照mapper定义的格式组合lib目录下面的所有jar文件，形成诸如lib/jar1.jar lib/jar2.jar的字符串-->
+			<fileset dir="lib">
+				<include name="*.jar" />
+			</fileset>
+		</pathconvert>
+
+		<!--组合各个路径，构成MANIFEST.MF文件中Class-Path所需的字符串-->
+		<property name="libs" value="${lib}" />
+
+		<!--打印一下刚才构造好的字符串，看看是否符合要求-->
+		<echo>libs   ${libs}</echo>
+		<!-- 生成清单文件 -->
+		<manifest file="${classes.dir}/MANIFEST.MF">
+			<attribute name="Main-Class" value="com.zong.zdb.util.CreateCodeUtil" />
+			<attribute name="Class-Path" value=" . ${libs}" />
+		</manifest>
 		<!-- jar文件的输出路径 -->
-		<jar destfile="${classes.dir}/zdb.jar" basedir="${classes.dir}">
+		<jar destfile="${classes.dir}/zdb${version}.jar" basedir="${classes.dir}" includes="**/*.class **/*.properties" manifest="${classes.dir}/MANIFEST.MF">
 		</jar>
+		<delete includeEmptyDirs="true">
+			<fileset dir="${classes.dir}/com" />
+			<fileset dir="${classes.dir}" includes="**/*.*" excludes="*.jar" />
+		</delete>
+	</target>
+
+	<!-- 打包zcoder -->
+	<target name="zcoder" depends="jar">
+		<copy file="${src.dir}/start.bat" tofile="${classes.dir}/start.bat" overwrite="true" />
+		<replace file="${classes.dir}/start.bat" token="zdb" value="zdb${version}" />
+		<zip destfile="${classes.dir}/zcoder${version}.zip" duplicate="preserve">
+			<zipfileset dir="${src.dir}" includes="btl/*.*" />
+			<zipfileset dir="${src.dir}" includes="zdb.json" />
+			<zipfileset dir="." includes="lib/*.*" />
+			<zipfileset dir="${classes.dir}" includes="zdb${version}.jar" />
+			<zipfileset dir="${classes.dir}" includes="start.bat" />
+		</zip>
+		<delete includeEmptyDirs="true">
+			<fileset dir="${classes.dir}" includes="**/*.*" excludes="*.zip" />
+		</delete>
 	</target>
 </project>

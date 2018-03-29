@@ -25,7 +25,7 @@ import com.zong.zdb.service.TemplateRoot;
  */
 public class ZDBConfig {
 	private static final Logger logger = Logger.getLogger(MysqlCodeDao.class);
-	
+
 	public static final String DRIVER_ORACLE = "oracle.jdbc.driver.OracleDriver";
 	public static final String DRIVER_MYSQL = "com.mysql.jdbc.Driver";
 	public static final String DRIVER_MSSQL = "com.microsoft.sqlserver.jdbc.SQLServerDriver";
@@ -123,20 +123,9 @@ public class ZDBConfig {
 				String url = data.get(JDBC_URL).toString();
 				String username = data.get(JDBC_USERNAME).toString();
 				String password = data.get(JDBC_PASSWORD).toString();
-				String[] ss = url.split("\\?")[0].split("/");
-				String database = ss[ss.length - 1];
 				IJdbcDao dao = null;
 				try {
-					// 初始化驱动包
-					Class.forName(driverClassName);
-					Connection conn = DriverManager.getConnection(url, username, password);
-					if (driverClassName.equals(DRIVER_MYSQL)) {
-						dao = new MysqlCodeDao(database, conn);
-					} else if (driverClassName.equals(DRIVER_ORACLE)) {
-						dao = new OracleCodeDao(username, conn);
-					} else if(driverClassName.equals(DRIVER_MSSQL)) {
-						dao = new SqlserverCodeDao(conn);
-					}
+					dao = createDao(driverClassName, url, username, password);
 				} catch (Exception e) {
 					logger.error(e.toString(), e);
 				}
@@ -144,6 +133,24 @@ public class ZDBConfig {
 			}
 		}
 
+	}
+
+	public static IJdbcDao createDao(String driverClassName, String url, String username, String password)
+			throws Exception {
+		String[] ss = url.split("\\?")[0].split("/");
+		String database = ss[ss.length - 1];
+		IJdbcDao dao = null;
+		// 初始化驱动包
+		Class.forName(driverClassName);
+		Connection conn = DriverManager.getConnection(url, username, password);
+		if (driverClassName.equals(DRIVER_MYSQL)) {
+			dao = new MysqlCodeDao(database, conn);
+		} else if (driverClassName.equals(DRIVER_ORACLE)) {
+			dao = new OracleCodeDao(username, conn);
+		} else if (driverClassName.equals(DRIVER_MSSQL)) {
+			dao = new SqlserverCodeDao(conn);
+		}
+		return dao;
 	}
 
 	@SuppressWarnings({ "unchecked", "rawtypes" })
@@ -158,11 +165,11 @@ public class ZDBConfig {
 		}
 		return null;
 	}
-	
+
 	/**
 	 * 重新连接，超时无法链接时重连
 	 */
-	public static void reconnect(){
+	public static void reconnect() {
 		initDataConns(configData);
 	}
 
@@ -176,7 +183,8 @@ public class ZDBConfig {
 			page.setTable("article");
 			codeService.showTableData("dwr", page);
 			objectMapper.configure(SerializationFeature.WRITE_NULL_MAP_VALUES, false);
-			System.out.println(objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(codeService.showSqlData("dwr", "select * from sys_user")));
+			System.out.println(objectMapper.writerWithDefaultPrettyPrinter()
+					.writeValueAsString(codeService.showSqlData("dwr", "select * from sys_user")));
 		} catch (Exception e) {
 			logger.error(e.toString(), e);
 		}
